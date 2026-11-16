@@ -1,0 +1,70 @@
+/* 回响市集 · 公共样式 */
+body {
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    background: #f2f4f8;
+    margin: 0;
+}
+
+.box {
+    width: 320px;
+    margin: 120px auto;
+    padding: 28px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+}
+
+.box.wide { width: 420px; padding: 32px; }
+
+h2 {
+    margin: 0 0 18px;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.box.wide h2 { font-size: 22px; }
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    height: 38px;
+    margin-bottom: 12px;
+    padding: 0 10px;
+    border: 1px solid #ccd2dc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus { border-color: #2b6cf6; }
+
+button {
+    width: 100%;
+    height: 40px;
+    border: 0;
+    border-radius: 6px;
+    background: #2b6cf6;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover { background: #1f5be0; }
+
+.msg {
+    color: #d33;
+    font-size: 13px;
+    min-height: 18px;
+    margin: 0 0 8px;
+}
+
+.tip {
+    margin-top: 14px;
+    color: #666;
+    font-size: 13px;
+}
+
+a { color: #2b6cf6; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+p { color: #555; font-size: 14px; line-height: 1.7; }
