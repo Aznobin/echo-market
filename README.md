@@ -1,8 +1,8 @@
-# 回响市集
+# 回响市集 EchoMarket
 
 ## 项目介绍
 
-回响市集是一个基于 Servlet + JSP 的 C2C（个人对个人）二手交易平台，旨在帮助用户发布闲置物品、寻找所需商品，让闲置资源得到再次利用。
+回响市集（echo-market）是一个基于 Servlet + JSP 的 C2C（个人对个人）二手交易平台，旨在帮助用户发布闲置物品、寻找所需商品，让闲置资源得到再次利用。
 
 用户既可以作为卖家发布商品，也可以作为买家浏览商品、提交订单。
 
@@ -29,17 +29,32 @@
 | 视图层 | JSP + EL + JSTL | 页面展示与数据渲染 |
 | 控制层 | Servlet | 接收请求、调用业务、页面跳转 |
 | 业务层 | Service | 处理商品、订单等业务逻辑 |
-| 数据访问层 | DAO + JDBC | 执行数据库操作 |
+| 数据访问层 | DAO + commons-dbutils | 执行数据库操作 |
+| 连接池 | c3p0 | 数据库连接管理 |
 | 数据库 | MySQL | 存储用户、商品和订单数据 |
 
 运行容器采用 Tomcat。
+
+## 版本与依赖
+
+| 项 | 版本 |
+| --- | --- |
+| JDK | Temurin 21.0.11 |
+| 构建工具 | Maven |
+| Servlet 容器 | Tomcat 10.1.59 |
+| Servlet / JSP | Jakarta Servlet 6.0 / JSP 3.1（Jakarta EE 10） |
+| 数据库 | MySQL 8 |
+| 连接池 | c3p0 0.9.5.5 |
+| 数据访问 | commons-dbutils 1.7 |
+
+工程标识：Group `com.echomarket`，Artifact `echo-market`，打包方式 `war`。
 
 ## 目录结构
 
 ```text
 src/main/
 ├── java/
-│   └── com/huixiang/
+│   └── com/echomarket/
 │       ├── controller/   # Servlet
 │       ├── service/      # 业务逻辑
 │       ├── dao/          # 数据库访问

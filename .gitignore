@@ -19,6 +19,16 @@
 *.tar.gz
 *.rar
 
+# Maven Wrapper 的 jar 必须入库，上面那行 *.jar 会误伤
+!.mvn/wrapper/maven-wrapper.jar
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Maven 构建产物
+target/
+
+# IDE
+.idea/
+*.iml
