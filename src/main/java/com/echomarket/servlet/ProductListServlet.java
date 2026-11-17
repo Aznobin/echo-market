@@ -1,4 +1,30 @@
 package com.echomarket.servlet;
 
-public class ProductListServlet {
+import com.echomarket.dao.ProductDao;
+import com.echomarket.entity.Product;
+import com.sun.net.httpserver.Request;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+@WebServlet("/products")
+public class ProductListServlet extends HttpServlet {
+    private ProductDao productDao = new ProductDao();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    try {
+        List<Product> productList = productDao.findAllOnSale();
+        req.setAttribute("products", productList);
+        req.getRequestDispatcher("/products.jsp").forward(req, resp);
+    } catch (SQLException e){
+        e.printStackTrace();
+    }
+    }
 }
