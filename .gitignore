@@ -33,5 +33,5 @@ target/
 .idea/
 *.iml
 
-# 数据库连接配置：含明文密码，不入库；模板见 src/main/resources/c3p0.properties.example
+# 数据库连接配置：含明文密码，不入库；模板见 src/main/resources/c3p0.properties
 src/main/resources/c3p0.properties
