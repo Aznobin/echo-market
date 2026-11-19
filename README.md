@@ -39,7 +39,7 @@
 
 | 项 | 版本 |
 | --- | --- |
-| JDK | Temurin 21.0.11 |
+| JDK | Temurin 25.0.5 |
 | 构建工具 | Maven |
 | Servlet 容器 | Tomcat 10.1.59 |
 | Servlet / JSP | Jakarta Servlet 6.0 / JSP 3.1（Jakarta EE 10） |
