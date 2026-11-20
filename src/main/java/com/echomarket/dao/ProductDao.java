@@ -17,4 +17,18 @@ public class ProductDao {
 //        return qr.query(sql,new BeanListHandler<>(Product.class));
         return qr.query(sql,new BeanListHandler<>(Product.class));
     }
+
+    public int insert(Product product) throws SQLException {
+        String sql = "INSERT INTO product (title, description, price, image, category_id, seller_id, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, 0)";
+        return qr.update(
+                sql,
+                product.getTitle(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getImage(),
+                product.getCategoryId(),
+                product.getSellerId()
+        );
+    }
 }
