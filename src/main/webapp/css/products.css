@@ -1,4 +1,3 @@
-/* 全局基础重置 */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,7 +11,6 @@ body {
     line-height: 1.6;
 }
 
-/* 顶部导航栏 */
 .navbar {
     background-color: #ffffff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -31,7 +29,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* 主体容器 */
 .container {
     max-width: 1100px;
     margin: 0 auto;
@@ -50,7 +47,6 @@ body {
     color: #1f2937;
 }
 
-/* 按钮样式 */
 .btn {
     display: inline-block;
     padding: 8px 16px;
@@ -96,7 +92,6 @@ body {
     background-color: #fee2e2;
 }
 
-/* 退出登录按钮样式 */
 .btn-logout {
     background-color: #f1f5f9;
     color: #64748b;
@@ -113,7 +108,6 @@ body {
     color: #dc2626;
 }
 
-/* 表格卡片容器 */
 .card {
     background-color: #ffffff;
     border-radius: 10px;
@@ -147,7 +141,6 @@ body {
     background-color: #f8fafc;
 }
 
-/* 商品图片与占位 */
 .product-img {
     width: 64px;
     height: 64px;
@@ -170,7 +163,6 @@ body {
     border: 1px dashed #cbd5e1;
 }
 
-/* 标题与描述 */
 .product-title {
     font-weight: 600;
     color: #1e293b;
@@ -186,14 +178,13 @@ body {
     text-overflow: ellipsis;
 }
 
-/* 价格高亮 */
+
 .price {
     color: #ef4444;
     font-weight: 700;
     font-size: 16px;
 }
 
-/* 状态徽章 */
 .badge {
     display: inline-block;
     padding: 4px 10px;
@@ -220,4 +211,23 @@ body {
 .time-text {
     color: #94a3b8;
     font-size: 13px;
+}
+
+/* 表格整体更舒展，避免列被挤得太窄 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+/* 表头和单元格默认不乱拆词换行 */
+th, td {
+    white-space: nowrap;
+}
+
+/* 价格列单独给一点最小宽度，防止长数字把 ¥ 挤到上面 */
+.price-cell,
+td.price {
+    min-width: 110px;
+    white-space: nowrap;
 }
