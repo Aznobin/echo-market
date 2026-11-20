@@ -213,21 +213,40 @@ body {
     font-size: 13px;
 }
 
-/* 表格整体更舒展，避免列被挤得太窄 */
+
 table {
     width: 100%;
     border-collapse: collapse;
     table-layout: auto;
 }
 
-/* 表头和单元格默认不乱拆词换行 */
+
 th, td {
     white-space: nowrap;
 }
 
-/* 价格列单独给一点最小宽度，防止长数字把 ¥ 挤到上面 */
+
 .price-cell,
 td.price {
     min-width: 110px;
     white-space: nowrap;
+}
+
+.product-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-title-link:hover .product-title {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.product-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.product-row:hover {
+    background-color: #f8fafc;
 }
