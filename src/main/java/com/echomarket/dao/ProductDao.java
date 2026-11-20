@@ -2,6 +2,7 @@ package com.echomarket.dao;
 
 import com.echomarket.entity.Product;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 
 import java.sql.SQLException;
@@ -30,5 +31,14 @@ public class ProductDao {
                 product.getCategoryId(),
                 product.getSellerId()
         );
+    }
+
+
+    public Product findById(int id) throws SQLException {
+        String sql = "SELECT id, title, description, price, image, " +
+                "category_id AS categoryId, seller_id AS sellerId, " +
+                "status, update_time AS updateTime " +
+                "FROM product WHERE id = ?";
+        return qr.query(sql, new BeanHandler<>(Product.class), id);
     }
 }

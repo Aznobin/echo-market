@@ -7,6 +7,7 @@
     <title>Echo Market - 二手商品首页</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/products.css">
 </head>
+
 <body>
 <header class="navbar">
     <a href="${pageContext.request.contextPath}/products" class="brand">Echo Market 二手集市</a>
@@ -33,9 +34,10 @@
                 <th width="110">商品状态</th>
             </tr>
             </thead>
+
             <tbody>
             <c:forEach items="${products}" var="p">
-                <tr>
+                <tr class="product-row" data-href="${pageContext.request.contextPath}/productdetail?id=${p.id}">
                     <td>#${p.id}</td>
 
                     <td>
@@ -77,6 +79,24 @@
                 </tr>
             </c:forEach>
             </tbody>
+
+
+            <script>
+                document.querySelectorAll('.product-row[data-href]').forEach(function (row) {
+                    row.addEventListener('click', function (e) {
+                        if (e.target.closest('a, button, input, select, textarea')) {
+                            return;
+                        }
+                        var href = row.getAttribute('data-href');
+                        if (href) {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            </script>
+
+
+
         </table>
     </div>
 </main>
