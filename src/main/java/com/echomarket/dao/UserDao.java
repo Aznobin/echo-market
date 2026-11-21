@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class UserDao {
 
-    private final QueryRunner qr = new QueryRunner(DBUtil.getDataSource());
+    private final QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
 //    查询用户名
     public User findByUsername(String username) throws SQLException {
