@@ -81,8 +81,7 @@
                     <c:choose>
                         <c:when test="${product.status == 0}">
                             <a class="btn btn-primary"
-                               href="${pageContext.request.contextPath}/order/create?productId=${product.id}">
-                                立即下单
+                               href="${pageContext.request.contextPath}/productbuy?productId=${product.id}">立即下单
                             </a>
                         </c:when>
                         <c:otherwise>
