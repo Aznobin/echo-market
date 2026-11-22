@@ -248,6 +248,7 @@ body {
         height: 220px;
     }
 }
+/* 收藏 / 联系卖家 / 举报 这几个新按钮用到的 */
 .inline-form {
     display: inline;
     margin: 0;
@@ -264,3 +265,13 @@ body {
     text-decoration: underline;
 }
 
+.btn-plain {
+    background-color: #ffffff;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-plain:hover {
+    color: #ef4444;
+    border-color: #fca5a5;
+}
