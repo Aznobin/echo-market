@@ -10,10 +10,27 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-// 过滤新用户，检测是否登陆
-@WebFilter("/welcome.jsp")
+@WebFilter(urlPatterns = {
+        "/welcome.jsp",
+        "/myorders",
+        "/soldorders",
+        "/orderdetail",
+        "/orderstatus",
+        "/orderadd",
+        "/favorites",
+        "/favoritetoggle",
+        "/messages",
+        "/messagethread",
+        "/messagesend",
+        "/reports",
+        "/reportadd",
+        "/ratingadd",
+        "/ratings",
+        "/adminreports",
+        "/adminreporthandle",
+        "/product/add"
+})
 public class LoginFilter implements Filter {
-
     @Override
     public void doFilter(jakarta.servlet.ServletRequest request,
                          jakarta.servlet.ServletResponse response,
