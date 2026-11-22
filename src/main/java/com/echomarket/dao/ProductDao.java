@@ -46,4 +46,9 @@ public class ProductDao {
                 "from product where seller_id = ? order by id desc";
         return qr.query(sql, new BeanListHandler<>(Product.class), sellerId);
     }
+
+    public int updateStatus(int id, int sellerId, int status) throws SQLException {
+        String sql = "update product set status = ? where id = ? and seller_id = ?";
+        return qr.update(sql, status, id, sellerId);
+    }
 }
