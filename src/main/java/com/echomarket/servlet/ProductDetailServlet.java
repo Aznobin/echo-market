@@ -2,6 +2,7 @@ package com.echomarket.servlet;
 
 import com.echomarket.dao.FavoriteDao;
 import com.echomarket.dao.ProductDao;
+import com.echomarket.dao.RatingDao;
 import com.echomarket.dao.UserDao;
 import com.echomarket.entity.Product;
 import com.echomarket.entity.User;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 @WebServlet("/productdetail")
 public class ProductDetailServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
+    private final RatingDao ratingDao = new RatingDao();
     private final FavoriteDao favoriteDao = new FavoriteDao();
     private final UserDao userDao = new UserDao();
 
@@ -59,6 +61,8 @@ public class ProductDetailServlet extends HttpServlet {
             try {
                 User seller = userDao.findById(product.getSellerId());
                 req.setAttribute("seller", seller);
+                req.setAttribute("sellerScore", ratingDao.avgScore(product.getSellerId()));
+                req.setAttribute("sellerRateCount", ratingDao.countByTo(product.getSellerId()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
