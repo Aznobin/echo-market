@@ -1,7 +1,7 @@
 package com.echomarket.servlet.account;
 
-import com.echomarket.entity.account.User;
-import com.echomarket.dao.account.UserDao;
+import com.echomarket.entity.User;
+import com.echomarket.dao.UserDao;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/login")
+// 登录页
 public class LoginServlet extends HttpServlet {
     private final UserDao userDao = new UserDao();
 
@@ -38,6 +39,7 @@ public class LoginServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
+        // 判断用户
         try {
             User user = userDao.findByUsername(username);
             if (user == null) {

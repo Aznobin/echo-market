@@ -1,9 +1,9 @@
 package com.echomarket.servlet.message;
 
-import com.echomarket.entity.message.Message;
-import com.echomarket.dao.message.MessageDao;
+import com.echomarket.entity.Message;
+import com.echomarket.dao.MessageDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/messagesend")
+// 发送消息
 public class MessageSendServlet extends HttpServlet {
     private final MessageDao messageDao = new MessageDao();
 
@@ -37,6 +38,7 @@ public class MessageSendServlet extends HttpServlet {
             return;
         }
 
+        // 获取消息内容
         String content = req.getParameter("content");
         if (content == null) {
             content = "";
@@ -51,6 +53,7 @@ public class MessageSendServlet extends HttpServlet {
             content = content.substring(0, 500);
         }
 
+        // 保存消息
         try {
             Message m = new Message();
             m.setFromId(user.getId());
