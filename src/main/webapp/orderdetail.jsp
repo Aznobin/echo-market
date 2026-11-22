@@ -147,6 +147,59 @@
                 <a class="btn btn-plain" href="${pageContext.request.contextPath}/myorders">返回订单列表</a>
             </div>
         </div>
+
+        <div class="detail-card">
+            <h2 class="page-title">这笔订单的评价</h2>
+
+            <div class="rating-links">
+                <a class="btn btn-plain" href="${pageContext.request.contextPath}/ratings?userId=${order.sellerId}">看卖家收到的评价</a>
+                <a class="btn btn-plain" href="${pageContext.request.contextPath}/ratings?userId=${order.buyerId}">看买家收到的评价</a>
+            </div>
+
+            <c:choose>
+                <c:when test="${empty ratings}">
+                    <p class="tip-text">双方都还没有评价。</p>
+                </c:when>
+                <c:otherwise>
+                    <c:forEach items="${ratings}" var="r">
+                        <div class="rating-item">
+                            <div class="rating-head">
+                                <span class="rating-from">${r.fromName}</span>
+                                <span class="rating-score">${r.score} 星</span>
+                            </div>
+                            <p class="rating-content">${r.content}</p>
+                            <p class="rating-time">${r.createTime}</p>
+                        </div>
+                    </c:forEach>
+                </c:otherwise>
+            </c:choose>
+
+            <c:if test="${order.status == 3 and empty myRating and (isBuyer or isSeller)}">
+                <form class="rating-form" action="${pageContext.request.contextPath}/ratingadd" method="post">
+                    <input type="hidden" name="orderId" value="${order.id}">
+                    <div class="form-row">
+                        <label for="score">打分</label>
+                        <select id="score" name="score" class="form-select">
+                            <option value="5">5 星（很满意）</option>
+                            <option value="4">4 星（满意）</option>
+                            <option value="3">3 星（一般）</option>
+                            <option value="2">2 星（不满意）</option>
+                            <option value="1">1 星（很差）</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="content">评价内容</label>
+                        <textarea id="content" name="content" rows="3" maxlength="255" class="form-textarea"
+                                  placeholder="说说这次交易怎么样（选填）"></textarea>
+                    </div>
+                    <button class="btn btn-primary" type="submit">提交评价</button>
+                </form>
+            </c:if>
+
+            <c:if test="${not empty myRating}">
+                <p class="tip-text">你已经评价过这笔订单了：${myRating.score} 星，${myRating.content}</p>
+            </c:if>
+        </div>
     </c:if>
 </main>
 </body>

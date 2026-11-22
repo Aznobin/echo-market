@@ -61,6 +61,8 @@
                     </c:choose>
                     <span class="meta-item">分类 ID：${product.categoryId}</span>
                     <span class="meta-item">卖家：${seller.username}</span>
+                    <span class="meta-item">卖家评分：<fmt:formatNumber value="${sellerScore}" pattern="0.0"/> 分（${sellerRateCount} 条）</span>
+                    <a class="meta-link" href="${pageContext.request.contextPath}/ratings?userId=${product.sellerId}">看 TA 收到的评价</a>
                 </div>
 
                 <h1 class="detail-title">${product.title}</h1>

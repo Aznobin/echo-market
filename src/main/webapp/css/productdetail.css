@@ -253,3 +253,14 @@ body {
     margin: 0;
 }
 
+.meta-link {
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+    margin-left: 6px;
+}
+
+.meta-link:hover {
+    text-decoration: underline;
+}
+
