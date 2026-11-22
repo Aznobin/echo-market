@@ -1,8 +1,8 @@
-package com.echomarket.dao.rating;
+package com.echomarket.dao;
 
-import com.echomarket.entity.rating.Rating;
+import com.echomarket.entity.Rating;
 
-import com.echomarket.dao.common.DBUtilDao;
+import com.echomarket.dao.DBUtilDao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -11,16 +11,18 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
-
+// 评价数据操作类
 public class RatingDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
+    // 保存订单评价
     public int insert(Rating r) throws SQLException {
         String sql = "insert into rating (order_id, from_id, to_id, score, content, status) " +
                 "values (?, ?, ?, ?, ?, 1)";
         return qr.update(sql, r.getOrderId(), r.getFromId(), r.getToId(), r.getScore(), r.getContent());
     }
 
+    // 判断用户是否评价过订单
     public Rating findByOrderAndFrom(int orderId, int fromId) throws SQLException {
         String sql = "select id, order_id as orderId, from_id as fromId, to_id as toId, score, content, " +
                 "status, create_time as createTime from rating " +
@@ -28,6 +30,7 @@ public class RatingDao {
         return qr.query(sql, new BeanHandler<>(Rating.class), orderId, fromId);
     }
 
+    // 查询订单评价
     public List<Rating> listByOrder(int orderId) throws SQLException {
         String sql = "select r.id, r.order_id as orderId, r.from_id as fromId, r.to_id as toId, r.score, " +
                 "r.content, r.status, r.create_time as createTime, " +
@@ -39,6 +42,7 @@ public class RatingDao {
         return qr.query(sql, new BeanListHandler<>(Rating.class), orderId);
     }
 
+    // 查询用户收到的评价
     public List<Rating> listByToId(int toId) throws SQLException {
         String sql = "select r.id, r.order_id as orderId, r.from_id as fromId, r.to_id as toId, r.score, r.content, " +
                 "r.status, r.create_time as createTime, u.username as fromName " +
@@ -47,6 +51,7 @@ public class RatingDao {
         return qr.query(sql, new BeanListHandler<>(Rating.class), toId);
     }
 
+    // 计算用户平均评分
     public BigDecimal avgScore(int toId) throws SQLException {
         String sql = "select avg(score) from rating where to_id = ? and status = 1 and is_deleted = 0";
         BigDecimal avg = qr.query(sql, new ScalarHandler<BigDecimal>(), toId);
@@ -56,6 +61,7 @@ public class RatingDao {
         return avg;
     }
 
+    // 统计收到的评价数量
     public int countByTo(int toId) throws SQLException {
         String sql = "select count(*) from rating where to_id = ? and status = 1 and is_deleted = 0";
         Long n = qr.query(sql, new ScalarHandler<Long>(), toId);
