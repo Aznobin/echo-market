@@ -68,3 +68,28 @@ a { color: #2b6cf6; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 p { color: #555; font-size: 14px; line-height: 1.7; }
+
+/* welcome 页顶栏：显示用户名 + 右上角退出 */
+.topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    font-size: 14px;
+}
+
+.topbar-user {
+    color: #4b5563;
+}
+
+.topbar-logout {
+    color: #ef4444;
+    text-decoration: none;
+}
+
+.topbar-logout:hover {
+    text-decoration: underline;
+}
