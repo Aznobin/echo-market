@@ -1,9 +1,11 @@
 package com.echomarket.servlet;
 
+import com.echomarket.dao.FavoriteDao;
 import com.echomarket.dao.ProductDao;
 import com.echomarket.dao.UserDao;
 import com.echomarket.entity.Product;
 import com.echomarket.entity.User;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +18,7 @@ import java.sql.SQLException;
 @WebServlet("/productdetail")
 public class ProductDetailServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
+    private final FavoriteDao favoriteDao = new FavoriteDao();
     private final UserDao userDao = new UserDao();
 
     @Override
@@ -58,6 +61,16 @@ public class ProductDetailServlet extends HttpServlet {
                 req.setAttribute("seller", seller);
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+
+            HttpSession session = req.getSession(false);
+            if (session != null && session.getAttribute("user") != null) {
+                User loginUser = (User) session.getAttribute("user");
+                try {
+                    req.setAttribute("favorited", favoriteDao.isFavorited(loginUser.getId(), id));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             req.getRequestDispatcher("/productdetail.jsp").forward(req,resp);
