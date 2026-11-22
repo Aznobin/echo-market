@@ -1,24 +1,26 @@
-package com.echomarket.dao.message;
+package com.echomarket.dao;
 
-import com.echomarket.entity.message.Message;
+import com.echomarket.entity.Message;
 
-import com.echomarket.dao.common.DBUtilDao;
+import com.echomarket.dao.DBUtilDao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import java.sql.SQLException;
 import java.util.List;
-
+// 消息数据操作类
 public class MessageDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
+    // 保存商品消息
     public int insert(Message m) throws SQLException {
         String sql = "insert into message (from_id, to_id, product_id, content, is_read, status) " +
                 "values (?, ?, ?, ?, 0, 1)";
         return qr.update(sql, m.getFromId(), m.getToId(), m.getProductId(), m.getContent());
     }
 
+    // 查询双方商品聊天记录
     public List<Message> listThread(int userId, int otherId, int productId) throws SQLException {
         String sql = "select id, from_id as fromId, to_id as toId, product_id as productId, content, " +
                 "is_read as isRead, status, create_time as createTime from message " +
@@ -28,6 +30,7 @@ public class MessageDao {
         return qr.query(sql, new BeanListHandler<>(Message.class), productId, userId, otherId, otherId, userId);
     }
 
+    // 查询用户相关会话
     public List<Message> listAllRelated(int userId) throws SQLException {
         String sql = "select m.id, m.from_id as fromId, m.to_id as toId, m.product_id as productId, " +
                 "m.content, m.is_read as isRead, m.status, m.create_time as createTime, " +
@@ -41,12 +44,14 @@ public class MessageDao {
         return qr.query(sql, new BeanListHandler<>(Message.class), userId, userId);
     }
 
+    // 标记消息已读
     public int markRead(int userId, int otherId, int productId) throws SQLException {
         String sql = "update message set is_read = 1 " +
                 "where to_id = ? and from_id = ? and product_id = ? and is_read = 0";
         return qr.update(sql, userId, otherId, productId);
     }
 
+    // 统计未读消息
     public int countUnread(int userId) throws SQLException {
         String sql = "select count(*) from message where to_id = ? and is_read = 0 and is_deleted = 0";
         Long n = qr.query(sql, new ScalarHandler<Long>(), userId);
