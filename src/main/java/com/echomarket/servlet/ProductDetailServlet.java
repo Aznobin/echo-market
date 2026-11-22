@@ -1,7 +1,9 @@
 package com.echomarket.servlet;
 
 import com.echomarket.dao.ProductDao;
+import com.echomarket.dao.UserDao;
 import com.echomarket.entity.Product;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,10 +13,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-
 @WebServlet("/productdetail")
 public class ProductDetailServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
+    private final UserDao userDao = new UserDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,6 +52,14 @@ public class ProductDetailServlet extends HttpServlet {
                 return;
             }
             req.setAttribute("product",product);
+
+            try {
+                User seller = userDao.findById(product.getSellerId());
+                req.setAttribute("seller", seller);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             req.getRequestDispatcher("/productdetail.jsp").forward(req,resp);
         } catch (SQLException e) {
             throw new ServletException("查询商品详情失败，id=" + id, e);
