@@ -1,75 +1,50 @@
 # 回响市集 EchoMarket
 
-## 项目介绍
+回响市集是一个面向校园的 C2C 二手交易课程项目。买卖双方可以发布和浏览闲置商品、通过站内消息沟通，并记录下单到成交的过程。
 
-回响市集（echo-market）是一个基于 Servlet + JSP 的 C2C（个人对个人）二手交易平台，旨在帮助用户发布闲置物品、寻找所需商品，让闲置资源得到再次利用。
+## 已实现功能
 
-用户既可以作为卖家发布商品，也可以作为买家浏览商品、提交订单。
-
-## 项目作用
-
-- 为个人闲置物品提供集中展示和交易的平台
-- 通过商品分类与搜索，帮助用户查找所需物品
-- 通过订单管理，记录买卖双方的交易情况
-- 作为 Java Web 学习实践项目，练习 MVC 分层、数据库访问与业务流程设计
-
-## 计划功能
-
-- 用户注册、登录及个人信息管理
-- 商品发布、编辑、下架与搜索
-- 下单及买卖双方订单管理
-- 管理员对用户和商品的基础管理
-
-## 技术架构
-
-采用 MVC 模式，并按职责划分各层：
-
-| 层级 | 技术 | 职责 |
-| --- | --- | --- |
-| 视图层 | JSP + EL + JSTL | 页面展示与数据渲染 |
-| 控制层 | Servlet | 接收请求、调用业务、页面跳转 |
-| 业务层 | Service | 处理商品、订单等业务逻辑 |
-| 数据访问层 | DAO + commons-dbutils | 执行数据库操作 |
-| 连接池 | c3p0 | 数据库连接管理 |
-| 数据库 | MySQL | 存储用户、商品和订单数据 |
-
-运行容器采用 Tomcat。
-
-## 版本与依赖
-
-| 项 | 版本 |
+| 模块 | 功能 |
 | --- | --- |
-| JDK | Temurin 25.0.5 |
-| 构建工具 | Maven |
-| Servlet 容器 | Tomcat 10.1.59 |
-| Servlet / JSP | Jakarta Servlet 6.0 / JSP 3.1（Jakarta EE 10） |
-| 数据库 | MySQL 8 |
-| 连接池 | c3p0 0.9.5.5 |
-| 数据访问 | commons-dbutils 1.7 |
+| 账号 | 注册、登录、退出登录 |
+| 商品 | 选择分类、上传图片并发布闲置商品；浏览在售商品和查看详情 |
+| 收藏 | 收藏、取消收藏和查看收藏列表 |
+| 私信 | 围绕商品发起会话、发送消息、查看消息列表及已读状态 |
+| 订单 | 下单，选择校内面交或宿舍配送；按买家和卖家分别查看、按状态筛选订单；发货、确认收货和取消订单 |
+| 评价 | 交易完成后买卖双方互评，浏览用户评价与评分 |
+| 举报 | 提交并查看自己的举报；管理员查看举报并更新处理状态 |
 
-工程标识：Group `com.echomarket`，Artifact `echo-market`，打包方式 `war`。
+订单页面演示付款和订单状态流转，不涉及真实资金交易。
 
-## 目录结构
+## 技术栈与结构
 
-```text
-src/main/
-├── java/
-│   └── com/echomarket/
-│       ├── controller/   # Servlet
-│       ├── service/      # 业务逻辑
-│       ├── dao/          # 数据库访问
-│       └── model/        # 实体类
-├── resources/            # 配置文件
-└── webapp/
-    ├── static/           # CSS、JS、图片
-    └── WEB-INF/
-        └── views/        # JSP 页面
-```
-
-## 请求流程
+- Java 21、Maven Wrapper、Tomcat 10.1，打包为 `echo-market.war`
+- Jakarta Servlet 6、JSP 3.1、EL、JSTL 3；页面由服务端渲染
+- MySQL 8、c3p0 连接池、Apache Commons DbUtils
 
 ```text
-浏览器 → Servlet → Service → DAO → MySQL
-           ↓
-       JSP 渲染页面 → 浏览器
+├── database/init.sql            # 建表及演示数据
+├── src/main/java/com/echomarket/
+│   ├── servlet/                 # 路由、表单处理与页面跳转
+│   ├── filter/                  # 登录检查
+│   ├── dao/                     # 数据库访问与下单事务
+│   └── entity/                  # 用户、商品、订单等实体
+├── src/main/resources/          # 数据库连接配置模板
+└── src/main/webapp/
+    ├── WEB-INF/views/           # 按业务划分的 JSP 视图
+    ├── WEB-INF/web.xml          # JSP 路径映射
+    ├── css/
+    └── images/
 ```
+
+浏览器请求由 Servlet 接收。Servlet 通过 DAO 读写 MySQL，再把页面数据交给 JSP 渲染。下单时，数据库事务把检查商品状态、标记商品和创建订单放在一起，防止同一件商品被重复购买。
+
+## 本地运行
+
+1. 准备 JDK 21、Tomcat 10.1 和 MySQL 8。将 [`database/init.sql`](database/init.sql) 导入独立的本地演示库；脚本会重建 `echo_market` 下的同名表，不要对已有业务数据的环境执行。
+2. 将 [`c3p0.properties.example`](src/main/resources/c3p0.properties.example) 复制为同目录下的 `c3p0.properties`，填写本地数据库连接信息。
+3. 在 Windows 运行 `mvnw.cmd package`，在 macOS 或 Linux 运行 `./mvnw package`。将生成的 `target/echo-market.war` 部署到 Tomcat 后，访问 `http://localhost:8080/echo-market/`（使用默认端口和部署路径时）。
+
+## 许可证
+
+[MIT License](LICENSE) · Copyright (c) 2026 Aznobin
