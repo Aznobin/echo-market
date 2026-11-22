@@ -106,6 +106,9 @@
 
                     <a class="btn btn-secondary"
                        href="${pageContext.request.contextPath}/messagethread?otherId=${product.sellerId}&productId=${product.id}">联系卖家</a>
+
+                    <a class="btn btn-plain"
+                       href="${pageContext.request.contextPath}/reportadd?targetType=2&targetId=${product.id}">举报这个商品</a>
                 </div>
             </div>
         </div>

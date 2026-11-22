@@ -17,6 +17,10 @@
         <a href="${pageContext.request.contextPath}/soldorders">我卖出的</a>
         <a href="${pageContext.request.contextPath}/favorites">我的收藏</a>
         <a href="${pageContext.request.contextPath}/messages">消息</a>
+        <a href="${pageContext.request.contextPath}/reports">我的举报</a>
+        <c:if test="${sessionScope.user.role == 1}">
+            <a href="${pageContext.request.contextPath}/adminreports">举报处理</a>
+        </c:if>
         <a href="${pageContext.request.contextPath}/logout" class="btn-logout">退出登录</a>
     </div>
 </header>
