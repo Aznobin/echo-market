@@ -6,7 +6,7 @@
 
     <groupId>com.echomarket</groupId>
     <artifactId>echo-market</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>echo-market</name>
     <packaging>war</packaging>
 

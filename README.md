@@ -31,12 +31,12 @@
 │   └── entity/                  # 用户、商品、订单等实体
 ├── src/main/resources/          # 数据库连接配置模板
 └── src/main/webapp/
-    ├── index.jsp               # 新版市集入口
-    ├── WEB-INF/views/          # 按业务划分的 JSP 视图（market/ 为新版市集）
-    ├── WEB-INF/web.xml         # JSP 路径映射
-    ├── css/                    # 页面样式
-    ├── js/market/              # 新版交互与接口适配
-    └── images/                 # 商品图片与演示素材
+    ├── index.jsp                # 新版市集入口
+    ├── WEB-INF/views/           # 按业务划分的 JSP 视图（market/ 为新版市集）
+    ├── WEB-INF/web.xml          # JSP 路径映射
+    ├── css/                     # 页面样式
+    ├── js/market/               # 新版交互与接口适配
+    └── images/                  # 商品图片与演示素材
 ```
 
 浏览器请求由 Servlet 接收。Servlet 通过 DAO 读写 MySQL，再把页面数据交给 JSP 渲染。下单时，数据库事务把检查商品状态、标记商品和创建订单放在一起，防止同一件商品被重复购买。
