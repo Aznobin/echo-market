@@ -250,3 +250,12 @@ td.price {
 .product-row:hover {
     background-color: #f8fafc;
 }
+.navbar div a:not(.btn):not(.btn-logout) {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.navbar div a:not(.btn):not(.btn-logout):hover {
+    color: #2563eb;
+}

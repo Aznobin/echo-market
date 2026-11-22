@@ -12,7 +12,8 @@
 <header class="navbar">
     <a href="${pageContext.request.contextPath}/products" class="brand">Echo Market 二手集市</a>
     <div style="display: flex; align-items: center; gap: 12px;">
-        <a href="${pageContext.request.contextPath}/productadd.jsp" class="btn btn-primary">+ 发布闲置商品</a>
+        <a href="${pageContext.request.contextPath}/productaddpage" class="btn btn-primary">+ 发布闲置商品</a>
+        <a href="${pageContext.request.contextPath}/products">浏览商品</a>
         <a href="${pageContext.request.contextPath}/logout" class="btn-logout">退出登录</a>
     </div>
 </header>
