@@ -12,7 +12,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>商品详情 - 回响市集 EchoMarket</title>
+    <title>Echo Market - 商品详情</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/productdetail.css">
 </head>
 <body>
@@ -60,7 +60,7 @@
                         </c:otherwise>
                     </c:choose>
                     <span class="meta-item">分类 ID：${product.categoryId}</span>
-                    <span class="meta-item">卖家 ID：${product.sellerId}</span>
+                    <span class="meta-item">卖家：${seller.username}</span>
                 </div>
 
                 <h1 class="detail-title">${product.title}</h1>

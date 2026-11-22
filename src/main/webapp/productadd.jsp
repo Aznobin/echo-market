@@ -6,11 +6,12 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>发布闲置商品</title>
+    <title>Echo Market - 发布闲置商品</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/productadd.css">
 </head>
 <body>
@@ -19,6 +20,10 @@
         <h2>发布闲置商品</h2>
         <a class="back-link" href="${pageContext.request.contextPath}/products">返回商品列表</a>
     </div>
+
+    <c:if test="${not empty msg}">
+        <div class="alert-msg">${msg}</div>
+    </c:if>
 
     <form action="${pageContext.request.contextPath}/product/add" method="post" enctype="multipart/form-data">
         <div class="form-group">
@@ -69,16 +74,9 @@
         <div class="form-group">
             <label>商品分类</label>
             <select class="form-select" name="categoryId">
-                <option value="1">数码电子</option>
-                <option value="2">图书教材</option>
-                <option value="3">生活用品</option>
-                <option value="4">服饰鞋包</option>
-                <option value="5">美妆个护</option>
-                <option value="6">运动户外</option>
-                <option value="7">家电厨具</option>
-                <option value="8">虚拟卡券</option>
-                <option value="9">乐器潮玩</option>
-                <option value="10">其他闲置</option>
+                <c:forEach items="${categories}" var="c">
+                    <option value="${c.id}">${c.name}</option>
+                </c:forEach>
             </select>
         </div>
 
