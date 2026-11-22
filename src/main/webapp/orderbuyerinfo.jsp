@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Echo Market - 确认订单</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/orderbuyerInfo.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/orderbuyerinfo.css">
 </head>
 <body>
 <main class="checkout-container">
@@ -16,7 +16,7 @@
             <span class="step-sep">›</span>
             <span class="step active">2. 填写交易信息</span>
             <span class="step-sep">›</span>
-            <span class="step">3. 提交订单</span>
+            <span class="step">3. 立即购买</span>
         </div>
     </div>
 
@@ -26,7 +26,7 @@
 
     <c:choose>
         <c:when test="${not empty product}">
-            <form class="checkout-layout" action="${pageContext.request.contextPath}/orderadd" method="post">
+            <form class="checkout-layout" id="orderForm" action="${pageContext.request.contextPath}/orderadd" method="post">
                 <input type="hidden" name="productId" value="${product.id}">
 
                 <!-- 左侧：交易与收货信息填写区 -->
@@ -175,7 +175,7 @@
                         <div class="summary-actions">
                             <c:choose>
                                 <c:when test="${product.status == 0}">
-                                    <button class="btn btn-primary btn-block" type="submit">提交订单</button>
+                                    <button class="btn btn-primary btn-block" type="button" onclick="showConfirm()">立即购买</button>
                                 </c:when>
                                 <c:otherwise>
                                     <button class="btn btn-disabled btn-block" type="button" disabled>商品已售出或下架</button>
@@ -197,5 +197,30 @@
         </c:otherwise>
     </c:choose>
 </main>
+
+<div class="confirm-mask" id="confirmMask">
+    <div class="confirm-box">
+        <h3 class="confirm-title">确认购买</h3>
+        <p class="confirm-text">确认以 ¥ ${product.price} 立即购买「${product.title}」吗？</p>
+        <div class="confirm-actions">
+            <button class="btn btn-plain" type="button" onclick="hideConfirm()">再想想</button>
+            <button class="btn btn-primary" type="button" onclick="doSubmit()">确认购买</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showConfirm() {
+        document.getElementById("confirmMask").style.display = "flex";
+    }
+
+    function hideConfirm() {
+        document.getElementById("confirmMask").style.display = "none";
+    }
+
+    function doSubmit() {
+        document.getElementById("orderForm").submit();
+    }
+</script>
 </body>
 </html>
