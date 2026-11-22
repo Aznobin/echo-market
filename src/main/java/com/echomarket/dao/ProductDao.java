@@ -11,16 +11,16 @@ import java.util.List;
 public class ProductDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
     public List<Product> findAllOnSale() throws SQLException {
-        String sql = "SELECT id, title, description, price, image, " +
-                "category_id AS categoryId, seller_id AS sellerId, " +
-                "status, update_time AS updateTime " +
-                "FROM product WHERE status = 0 ORDER BY update_time DESC";
+        String sql = "select id, title, description, price, image, " +
+                "category_id as categoryId, seller_id as sellerId, " +
+                "status, update_time as updateTime " +
+                "from product where status = 0 order by update_time desc";
         return qr.query(sql,new BeanListHandler<>(Product.class));
     }
 
     public int insert(Product product) throws SQLException {
-        String sql = "INSERT INTO product (title, description, price, image, category_id, seller_id, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, 0)";
+        String sql = "insert into product (title, description, price, image, category_id, seller_id, status) " +
+                "values (?, ?, ?, ?, ?, ?, 0)";
         return qr.update(
                 sql,
                 product.getTitle(),
@@ -32,12 +32,18 @@ public class ProductDao {
         );
     }
 
-
     public Product findById(int id) throws SQLException {
-        String sql = "SELECT id, title, description, price, image, " +
-                "category_id AS categoryId, seller_id AS sellerId, " +
-                "status, update_time AS updateTime " +
-                "FROM product WHERE id = ?";
+        String sql = "select id, title, description, price, image, " +
+                "category_id as categoryId, seller_id as sellerId, " +
+                "status, update_time as updateTime " +
+                "from product where id = ?";
         return qr.query(sql, new BeanHandler<>(Product.class), id);
+    }
+
+    public List<Product> listBySeller(int sellerId) throws SQLException {
+        String sql = "select id, title, description, price, image, category_id as categoryId, " +
+                "seller_id as sellerId, status, update_time as updateTime " +
+                "from product where seller_id = ? order by id desc";
+        return qr.query(sql, new BeanListHandler<>(Product.class), sellerId);
     }
 }

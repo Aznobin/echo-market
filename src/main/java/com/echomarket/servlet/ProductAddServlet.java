@@ -32,15 +32,33 @@ public class ProductAddServlet extends HttpServlet {
         String description = req.getParameter("description");
         String categoryIdStr = req.getParameter("categoryId");
 
+        if (title == null || title.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("商品名称不能为空"));
+            return;
+        }
+        if (title.trim().length() > 100) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("商品名称太长了，最多 100 个字"));
+            return;
+        }
+
+        BigDecimal price;
+        try {
+            price = new BigDecimal(priceStr);
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("价格填得不对"));
+            return;
+        }
+        if (price.compareTo(new BigDecimal("0.01")) < 0 || price.compareTo(new BigDecimal("999999.99")) > 0) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("价格要在 0.01 到 999999.99 之间"));
+            return;
+        }
+
         Product product = new Product();
-        product.setTitle(title);
+        product.setTitle(title.trim());
         product.setDescription(description);
-        product.setPrice(priceStr != null && !priceStr.isEmpty()
-                ? new BigDecimal(priceStr)
-                : BigDecimal.ZERO);
-        product.setCategoryId((categoryIdStr != null && !categoryIdStr.isEmpty())
-                ? Integer.parseInt(categoryIdStr)
-                : 1);
+        product.setPrice(price);
+        int categoryId = parsePositiveInt(categoryIdStr);
+        product.setCategoryId(categoryId > 0 ? categoryId : 1);
         product.setStatus(0);
 
         HttpSession session = req.getSession(false);
@@ -60,7 +78,7 @@ public class ProductAddServlet extends HttpServlet {
 
         Part filePart = req.getPart("imageFile");
         if (filePart == null || filePart.getSize() == 0) {
-            resp.sendRedirect(req.getContextPath() + "/productadd.jsp");
+            resp.sendRedirect(req.getContextPath() + "/productaddpage");
             return;
         }
 
@@ -83,5 +101,25 @@ public class ProductAddServlet extends HttpServlet {
         }
 
         resp.sendRedirect(req.getContextPath() + "/products");
+    }
+
+    private String enc(String text) {
+        try {
+            return java.net.URLEncoder.encode(text, "UTF-8");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private int parsePositiveInt(String val) {
+        if (val == null) {
+            return -1;
+        }
+        try {
+            int n = Integer.parseInt(val.trim());
+            return n > 0 ? n : -1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }
