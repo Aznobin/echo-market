@@ -89,6 +89,18 @@
                         </c:otherwise>
                     </c:choose>
                     <a class="btn btn-secondary" href="${pageContext.request.contextPath}/products">继续浏览</a>
+
+                    <form action="${pageContext.request.contextPath}/favoritetoggle" method="post" class="inline-form">
+                        <input type="hidden" name="productId" value="${product.id}">
+                        <c:choose>
+                            <c:when test="${favorited}">
+                                <button class="btn btn-secondary" type="submit">取消收藏</button>
+                            </c:when>
+                            <c:otherwise>
+                                <button class="btn btn-secondary" type="submit">收藏这个商品</button>
+                            </c:otherwise>
+                        </c:choose>
+                    </form>
                 </div>
             </div>
         </div>

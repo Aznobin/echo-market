@@ -248,3 +248,8 @@ body {
         height: 220px;
     }
 }
+.inline-form {
+    display: inline;
+    margin: 0;
+}
+
