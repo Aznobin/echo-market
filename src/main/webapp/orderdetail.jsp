@@ -16,6 +16,7 @@
         <a href="${pageContext.request.contextPath}/myorders">我买到的</a>
         <a href="${pageContext.request.contextPath}/soldorders">我卖出的</a>
         <a href="${pageContext.request.contextPath}/favorites">我的收藏</a>
+        <a href="${pageContext.request.contextPath}/messages">消息</a>
         <a href="${pageContext.request.contextPath}/logout" class="btn-logout">退出登录</a>
     </div>
 </header>
@@ -142,6 +143,15 @@
                         <input type="hidden" name="action" value="cancel">
                         <button class="btn btn-plain" type="submit">取消订单</button>
                     </form>
+                </c:if>
+
+                <c:if test="${isBuyer}">
+                    <a class="btn btn-secondary"
+                       href="${pageContext.request.contextPath}/messagethread?otherId=${order.sellerId}&productId=${order.productId}">联系卖家</a>
+                </c:if>
+                <c:if test="${isSeller}">
+                    <a class="btn btn-secondary"
+                       href="${pageContext.request.contextPath}/messagethread?otherId=${order.buyerId}&productId=${order.productId}">联系买家</a>
                 </c:if>
 
                 <a class="btn btn-plain" href="${pageContext.request.contextPath}/myorders">返回订单列表</a>

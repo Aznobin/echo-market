@@ -103,6 +103,9 @@
                             </c:otherwise>
                         </c:choose>
                     </form>
+
+                    <a class="btn btn-secondary"
+                       href="${pageContext.request.contextPath}/messagethread?otherId=${product.sellerId}&productId=${product.id}">联系卖家</a>
                 </div>
             </div>
         </div>

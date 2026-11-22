@@ -16,6 +16,7 @@
         <a href="${pageContext.request.contextPath}/myorders">我买到的</a>
         <a href="${pageContext.request.contextPath}/soldorders">我卖出的</a>
         <a href="${pageContext.request.contextPath}/favorites">我的收藏</a>
+        <a href="${pageContext.request.contextPath}/messages">消息</a>
         <a href="${pageContext.request.contextPath}/logout" class="btn-logout">退出登录</a>
     </div>
 </header>
