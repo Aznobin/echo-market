@@ -1,0 +1,126 @@
+package com.echomarket.servlet.product;
+
+import com.echomarket.entity.product.Product;
+import com.echomarket.dao.product.ProductDao;
+
+import com.echomarket.entity.account.User;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+
+@WebServlet("/product/add")
+@MultipartConfig
+public class ProductAddServlet extends HttpServlet {
+    private final ProductDao productDao = new ProductDao();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+
+        String title = req.getParameter("title");
+        String priceStr = req.getParameter("price");
+        String description = req.getParameter("description");
+        String categoryIdStr = req.getParameter("categoryId");
+
+        if (title == null || title.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("商品名称不能为空"));
+            return;
+        }
+        if (title.trim().length() > 100) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("商品名称太长了，最多 100 个字"));
+            return;
+        }
+
+        BigDecimal price;
+        try {
+            price = new BigDecimal(priceStr);
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("价格填得不对"));
+            return;
+        }
+        if (price.compareTo(new BigDecimal("0.01")) < 0 || price.compareTo(new BigDecimal("999999.99")) > 0) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage?msg=" + enc("价格要在 0.01 到 999999.99 之间"));
+            return;
+        }
+
+        Product product = new Product();
+        product.setTitle(title.trim());
+        product.setDescription(description);
+        product.setPrice(price);
+        int categoryId = parsePositiveInt(categoryIdStr);
+        product.setCategoryId(categoryId > 0 ? categoryId : 1);
+        product.setStatus(0);
+
+        HttpSession session = req.getSession(false);
+        Object loginUser = (session != null) ? session.getAttribute("user") : null;
+        if (loginUser instanceof User) {
+            User user = (User) loginUser;
+            product.setSellerId(user.getId());
+        } else {
+            resp.setContentType("text/html;charset=UTF-8");
+            java.io.PrintWriter out = resp.getWriter();
+            out.println("<script>");
+            out.println("alert('请先登录后再发布闲置商品！');");
+            out.println("location.href='" + req.getContextPath() + "/login.jsp';");
+            out.println("</script>");
+            return;
+        }
+
+        Part filePart = req.getPart("imageFile");
+        if (filePart == null || filePart.getSize() == 0) {
+            resp.sendRedirect(req.getContextPath() + "/productaddpage");
+            return;
+        }
+
+        String submittedFileName = filePart.getSubmittedFileName();
+        String fileName = Paths.get(submittedFileName).getFileName().toString();
+
+        String uploadDir = getServletContext().getRealPath("/images");
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        filePart.write(new File(dir, fileName).getAbsolutePath());
+        product.setImage(fileName);
+
+        try {
+            productDao.insert(product);
+        } catch (SQLException e) {
+            System.err.println("插入商品失败：" + e.getMessage());
+            e.printStackTrace();
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/products");
+    }
+
+    private String enc(String text) {
+        try {
+            return java.net.URLEncoder.encode(text, "UTF-8");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private int parsePositiveInt(String val) {
+        if (val == null) {
+            return -1;
+        }
+        try {
+            int n = Integer.parseInt(val.trim());
+            return n > 0 ? n : -1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+}
