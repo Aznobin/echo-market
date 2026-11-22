@@ -1,6 +1,9 @@
 package com.echomarket.dao;
 
 import com.echomarket.entity.Order;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -10,16 +13,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class OrderDao {
+    private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
     public Order createOrder(int productId, int buyerId, String deliveryType,
                              String payMethod, String receiverName, String phone,
                              String address, String remark) throws SQLException {
-        String selectProductSql = "SELECT seller_id, price, status FROM product WHERE id = ? FOR UPDATE";
-        String updateProductSql = "UPDATE product SET status = 1 WHERE id = ? AND status = 0";
-        String insertOrderSql = "INSERT INTO orders " +
+        String selectProductSql = "select seller_id, price, status from product where id = ? FOR update";
+        String updateProductSql = "update product set status = 1 where id = ? and status = 0";
+        String insertOrderSql = "insert into orders " +
                 "(order_no, product_id, buyer_id, seller_id, amount, delivery_type, pay_method, receiver_name, phone, address, remark, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -64,7 +70,7 @@ public class OrderDao {
             }
 
             String orderNo = generateOrderNo();
-            int initialStatus = 0; // 0: 待付款
+            int initialStatus = 0;
 
             Order order = new Order();
             order.setOrderNo(orderNo);
@@ -137,5 +143,66 @@ public class OrderDao {
         String timePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         int randPart = ThreadLocalRandom.current().nextInt(1000, 10000);
         return "EM" + timePart + randPart;
+    }
+
+    public Order findById(int id) throws SQLException {
+        String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
+                "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
+                "o.receiver_name as receiverName, o.phone, o.address, o.remark, o.status, " +
+                "o.update_time as updateTime, p.title as productTitle, p.image as productImage, " +
+                "bu.username as buyerName, su.username as sellerName " +
+                "from orders o " +
+                "left join product p on o.product_id = p.id " +
+                "left join `user` bu on o.buyer_id = bu.id " +
+                "left join `user` su on o.seller_id = su.id " +
+                "where o.id = ?";
+        return qr.query(sql, new BeanHandler<>(Order.class), id);
+    }
+
+    public List<Order> listByBuyer(int buyerId, int status) throws SQLException {
+        String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
+                "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
+                "o.receiver_name as receiverName, o.phone, o.address, o.remark, o.status, " +
+                "o.update_time as updateTime, p.title as productTitle, p.image as productImage, " +
+                "bu.username as buyerName, su.username as sellerName " +
+                "from orders o " +
+                "left join product p on o.product_id = p.id " +
+                "left join `user` bu on o.buyer_id = bu.id " +
+                "left join `user` su on o.seller_id = su.id " +
+                "where o.buyer_id = ?";
+        List<Object> params = new ArrayList<>();
+        params.add(buyerId);
+        if (status >= 0) {
+            sql = sql + " AND o.status = ?";
+            params.add(status);
+        }
+        sql = sql + " ORDER BY o.id DESC";
+        return qr.query(sql, new BeanListHandler<>(Order.class), params.toArray());
+    }
+
+    public List<Order> listBySeller(int sellerId, int status) throws SQLException {
+        String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
+                "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
+                "o.receiver_name as receiverName, o.phone, o.address, o.remark, o.status, " +
+                "o.update_time as updateTime, p.title as productTitle, p.image as productImage, " +
+                "bu.username as buyerName, su.username as sellerName " +
+                "from orders o " +
+                "left join product p on o.product_id = p.id " +
+                "left join `user` bu on o.buyer_id = bu.id " +
+                "left join `user` su on o.seller_id = su.id " +
+                "where o.seller_id = ?";
+        List<Object> params = new ArrayList<>();
+        params.add(sellerId);
+        if (status >= 0) {
+            sql = sql + " AND o.status = ?";
+            params.add(status);
+        }
+        sql = sql + " ORDER BY o.id DESC";
+        return qr.query(sql, new BeanListHandler<>(Order.class), params.toArray());
+    }
+
+    public int updateStatus(int orderId, int fromStatus, int toStatus) throws SQLException {
+        String sql = "update orders set status = ? where id = ? and status = ?";
+        return qr.update(sql, toStatus, orderId, fromStatus);
     }
 }

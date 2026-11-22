@@ -11,7 +11,6 @@ import java.io.IOException;
 
 @WebServlet("/productbuy")
 public class OrderBuyerInfoServlet extends HttpServlet {
-
     private final ProductDao productDao = new ProductDao();
 
     @Override

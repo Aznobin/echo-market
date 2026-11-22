@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 
 @WebServlet("/orderadd")
 public class OrderAddServlet extends HttpServlet {
-
     private final OrderDao orderDao = new OrderDao();
     private final ProductDao productDao = new ProductDao();
 
@@ -72,9 +71,10 @@ public class OrderAddServlet extends HttpServlet {
                     productId, buyerId, deliveryType, payMethod,
                     receiverName, phone, address, remark
             );
+            orderDao.updateStatus(created.getId(), 0, 1);
             HttpSession session = req.getSession();
             session.setAttribute("lastOrder", created);
-            resp.sendRedirect(req.getContextPath() + "/ordersuccess.jsp");
+            resp.sendRedirect(req.getContextPath() + "/orderdetail?id=" + created.getId());
         } catch (IllegalStateException e) {
             req.setAttribute("msg", e.getMessage());
             req.getRequestDispatcher("/orderbuyerinfo.jsp").forward(req, resp);
