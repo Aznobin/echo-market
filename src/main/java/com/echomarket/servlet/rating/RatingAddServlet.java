@@ -1,11 +1,11 @@
 package com.echomarket.servlet.rating;
 
-import com.echomarket.entity.rating.Rating;
-import com.echomarket.dao.rating.RatingDao;
+import com.echomarket.entity.Rating;
+import com.echomarket.dao.RatingDao;
 
-import com.echomarket.dao.order.OrderDao;
-import com.echomarket.entity.order.Order;
-import com.echomarket.entity.account.User;
+import com.echomarket.dao.OrderDao;
+import com.echomarket.entity.Order;
+import com.echomarket.entity.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/ratingadd")
+// 提交评价
 public class RatingAddServlet extends HttpServlet {
     private final OrderDao orderDao = new OrderDao();
     private final RatingDao ratingDao = new RatingDao();
@@ -59,6 +60,7 @@ public class RatingAddServlet extends HttpServlet {
         }
 
         try {
+            // 判断订单是否允许评价
             Order order = orderDao.findById(orderId);
             if (order == null) {
                 resp.sendRedirect(req.getContextPath() + "/myorders");
@@ -84,6 +86,7 @@ public class RatingAddServlet extends HttpServlet {
                 return;
             }
 
+            // 保存评价
             Rating r = new Rating();
             r.setOrderId(orderId);
             r.setFromId(user.getId());

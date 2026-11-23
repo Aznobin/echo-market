@@ -1,10 +1,10 @@
 package com.echomarket.servlet.rating;
 
-import com.echomarket.entity.rating.Rating;
-import com.echomarket.dao.rating.RatingDao;
+import com.echomarket.entity.Rating;
+import com.echomarket.dao.RatingDao;
 
-import com.echomarket.dao.account.UserDao;
-import com.echomarket.entity.account.User;
+import com.echomarket.dao.UserDao;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @WebServlet("/ratings")
+// 用户评价页
 public class RatingListServlet extends HttpServlet {
     private final RatingDao ratingDao = new RatingDao();
     private final UserDao userDao = new UserDao();

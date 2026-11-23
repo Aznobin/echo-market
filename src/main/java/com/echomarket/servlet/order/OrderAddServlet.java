@@ -1,7 +1,7 @@
 package com.echomarket.servlet.order;
 
-import com.echomarket.entity.order.Order;
-import com.echomarket.dao.order.OrderDao;
+import com.echomarket.entity.Order;
+import com.echomarket.dao.OrderDao;
 
 import com.echomarket.dao.product.ProductDao;
 import com.echomarket.entity.product.Product;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 @WebServlet("/orderadd")
+// 创建订单
 public class OrderAddServlet extends HttpServlet {
     private final OrderDao orderDao = new OrderDao();
     private final ProductDao productDao = new ProductDao();
@@ -25,6 +26,7 @@ public class OrderAddServlet extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
+        // 获取当前买家
         Integer buyerId = resolveLoginUserId(req);
         int productId = parsePositiveInt(req.getParameter("productId"));
         String deliveryType = trimOrNull(req.getParameter("deliveryType"));
@@ -35,6 +37,7 @@ public class OrderAddServlet extends HttpServlet {
         String remark = trimOrNull(req.getParameter("remark"));
 
         if (productId > 0) {
+            // 创建订单
             try {
                 Product product = productDao.findById(productId);
                 req.setAttribute("product", product);
@@ -42,6 +45,7 @@ public class OrderAddServlet extends HttpServlet {
             }
         }
 
+        // 判断登录状态
         if (buyerId == null) {
             req.setAttribute("msg", "请先登录后再提交订单");
             req.getRequestDispatcher("/orderbuyerinfo.jsp").forward(req, resp);
@@ -86,6 +90,7 @@ public class OrderAddServlet extends HttpServlet {
         }
     }
 
+    // 获取当前登录用户编号
     private Integer resolveLoginUserId(HttpServletRequest req) {
         HttpSession session = req.getSession(false);
         if (session == null) {
