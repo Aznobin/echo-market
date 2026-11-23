@@ -1,8 +1,8 @@
-package com.echomarket.dao.order;
+package com.echomarket.dao;
 
-import com.echomarket.entity.order.Order;
+import com.echomarket.entity.Order;
 
-import com.echomarket.dao.common.DBUtilDao;
+import com.echomarket.dao.DBUtilDao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -18,10 +18,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
+// 订单数据操作类
 public class OrderDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
+    // 创建订单并锁定商品
     public Order createOrder(int productId, int buyerId, String deliveryType,
                              String payMethod, String receiverName, String phone,
                              String address, String remark) throws SQLException {
@@ -147,6 +148,7 @@ public class OrderDao {
         return "EM" + timePart + randPart;
     }
 
+    // 查询订单详情
     public Order findById(int id) throws SQLException {
         String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
                 "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
@@ -161,6 +163,7 @@ public class OrderDao {
         return qr.query(sql, new BeanHandler<>(Order.class), id);
     }
 
+    // 查询买家订单
     public List<Order> listByBuyer(int buyerId, int status) throws SQLException {
         String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
                 "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
@@ -182,6 +185,7 @@ public class OrderDao {
         return qr.query(sql, new BeanListHandler<>(Order.class), params.toArray());
     }
 
+    // 查询卖家订单
     public List<Order> listBySeller(int sellerId, int status) throws SQLException {
         String sql = "select o.id, o.order_no as orderNo, o.product_id as productId, o.buyer_id as buyerId, " +
                 "o.seller_id as sellerId, o.amount, o.delivery_type as deliveryType, o.pay_method as payMethod, " +
@@ -203,6 +207,7 @@ public class OrderDao {
         return qr.query(sql, new BeanListHandler<>(Order.class), params.toArray());
     }
 
+    // 更新订单状态
     public int updateStatus(int orderId, int fromStatus, int toStatus) throws SQLException {
         String sql = "update orders set status = ? where id = ? and status = ?";
         return qr.update(sql, toStatus, orderId, fromStatus);

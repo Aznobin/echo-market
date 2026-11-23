@@ -17,6 +17,7 @@
     <p>注册时间：${sessionScope.user.createTime}</p>
     <p>状态：${sessionScope.user.status}</p>
     <p><a href="${pageContext.request.contextPath}/products">进入商品集市 →</a></p>
+    <p><a href="${pageContext.request.contextPath}/profile">修改个人资料</a></p>
 </div>
 </body>
 </html>

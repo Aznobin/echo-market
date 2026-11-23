@@ -1,9 +1,9 @@
 package com.echomarket.servlet.message;
 
-import com.echomarket.entity.message.Message;
-import com.echomarket.dao.message.MessageDao;
+import com.echomarket.entity.Message;
+import com.echomarket.dao.MessageDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/messages")
+// 消息中心页
 public class MessageListServlet extends HttpServlet {
     private final MessageDao messageDao = new MessageDao();
 

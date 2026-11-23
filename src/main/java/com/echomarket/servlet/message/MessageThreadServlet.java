@@ -1,12 +1,12 @@
 package com.echomarket.servlet.message;
 
-import com.echomarket.entity.message.Message;
-import com.echomarket.dao.message.MessageDao;
+import com.echomarket.entity.Message;
+import com.echomarket.dao.MessageDao;
 
 import com.echomarket.dao.product.ProductDao;
-import com.echomarket.dao.account.UserDao;
+import com.echomarket.dao.UserDao;
 import com.echomarket.entity.product.Product;
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/messagethread")
+// 商品聊天页
 public class MessageThreadServlet extends HttpServlet {
     private final MessageDao messageDao = new MessageDao();
     private final UserDao userDao = new UserDao();
@@ -46,8 +47,10 @@ public class MessageThreadServlet extends HttpServlet {
         }
 
         try {
+            // 标记当前会话已读
             messageDao.markRead(user.getId(), otherId, productId);
 
+            // 查询商品聊天记录
             List<Message> messages = messageDao.listThread(user.getId(), otherId, productId);
             User other = userDao.findById(otherId);
             Product product = productDao.findById(productId);
