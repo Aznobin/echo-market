@@ -3,7 +3,7 @@ package com.echomarket.servlet.product;
 import com.echomarket.entity.product.Product;
 import com.echomarket.dao.product.ProductDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 
 @WebServlet("/product/add")
 @MultipartConfig
+// 发布商品
 public class ProductAddServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
 
@@ -28,6 +29,7 @@ public class ProductAddServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
+        // 获取商品表单
         String title = req.getParameter("title");
         String priceStr = req.getParameter("price");
         String description = req.getParameter("description");
@@ -43,6 +45,7 @@ public class ProductAddServlet extends HttpServlet {
         }
 
         BigDecimal price;
+        // 保存商品信息
         try {
             price = new BigDecimal(priceStr);
         } catch (Exception e) {
@@ -77,6 +80,7 @@ public class ProductAddServlet extends HttpServlet {
             return;
         }
 
+        // 保存商品图片
         Part filePart = req.getPart("imageFile");
         if (filePart == null || filePart.getSize() == 0) {
             resp.sendRedirect(req.getContextPath() + "/productaddpage");
