@@ -1,22 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>Echo Market - 欢迎</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common/style.css">
-</head>
-<body>
-<div class="topbar">
-    <span class="topbar-user">当前用户：${sessionScope.user.username}</span>
-    <a class="topbar-logout" href="${pageContext.request.contextPath}/logout">退出登录</a>
-</div>
-
-<div class="box wide">
-    <h2>欢迎，${sessionScope.user.username}</h2>
-    <p>注册时间：${sessionScope.user.createTime}</p>
-    <p>状态：${sessionScope.user.status}</p>
-    <p><a href="${pageContext.request.contextPath}/products">进入商品集市 →</a></p>
-</div>
-</body>
-</html>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="market" tagdir="/WEB-INF/tags/market" %>
+<market:layout title="欢迎" stylesheet="/css/market/account.css">
+    <section class="panel welcome-panel">
+        <header class="page-head"><h1>欢迎来到回响市集</h1><p>校园里有好物等你发现。</p></header>
+        <market:identity name="${empty sessionScope.user.nickname ? sessionScope.user.username : sessionScope.user.nickname}"/>
+        <p class="muted">注册时间：<c:out value="${sessionScope.user.createTime}"/></p>
+        <div class="actions"><a class="btn primary" href="<c:url value='/products'/>">进入商品集市</a></div>
+    </section>
+</market:layout>
