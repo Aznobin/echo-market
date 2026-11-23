@@ -40,7 +40,7 @@ public class ProductDetailServlet extends HttpServlet {
         try {
             id = Integer.parseInt(idParam.trim());
             if (id <= 0){
-                req.setAttribute("msg", "商品编号无效");
+                req.setAttribute("mag", "商品编号无效");
                 req.getRequestDispatcher("/productdetail.jsp").forward(req,resp);
                 return;
             }

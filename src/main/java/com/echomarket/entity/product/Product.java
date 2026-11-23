@@ -13,13 +13,6 @@ public class Product {
     private Integer sellerId;
     private Integer status;
     private Timestamp updateTime;
-    private String categoryName;
-    private String sellerName;
-
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
-    public String getSellerName() { return sellerName; }
-    public void setSellerName(String sellerName) { this.sellerName = sellerName; }
 
     @Override
     public String toString() {

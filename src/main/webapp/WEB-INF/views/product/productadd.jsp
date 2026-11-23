@@ -1,26 +1,100 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%--
+  Created by IntelliJ IDEA.
+  User: miku
+  Date: 2026/11/20
+  Time: 10:38
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="market" tagdir="/WEB-INF/tags/market" %>
-<market:layout title="发布闲置" stylesheet="/css/market/products.css">
-    <a class="text-link crumb" href="<c:url value='/products'/>">← 返回商品列表</a>
-    <header class="page-head"><h1>发布闲置</h1><p>拍一张清楚的照片，描述物品成色和交易方式。</p></header>
-    <c:if test="${not empty msg}"><p class="notice publish-notice" role="alert"><c:out value="${msg}"/></p></c:if>
-    <form class="columns publish-layout" action="<c:url value='/product/add'/>" method="post" enctype="multipart/form-data">
-        <section class="panel form" aria-label="商品信息">
-            <label class="field">商品名称<input name="title" maxlength="100" required></label>
-            <div class="form-row">
-                <label class="field">价格（元）<input type="number" inputmode="decimal" name="price" step="0.01" min="0.01" max="999999.99" required></label>
-                <label class="field">商品分类<select name="categoryId" required>
-                    <c:forEach items="${categories}" var="category"><option value="${category.id}"><c:out value="${category.name}"/></option></c:forEach>
-                </select></label>
-            </div>
-            <label class="field">商品描述<textarea name="description" rows="5" placeholder="使用情况、配件、适合在哪里交接"></textarea></label>
-            <div class="actions"><button class="btn primary" type="submit">确认发布</button><a class="btn" href="<c:url value='/products'/>">取消</a></div>
-        </section>
-        <section class="panel form" aria-label="商品照片">
-            <label class="field">商品照片<input type="file" name="imageFile" id="product-photo" accept="image/*" required></label>
-            <figure class="upload-preview"><img id="photo-preview" alt="待发布商品的照片" hidden><span id="photo-hint" class="muted">选择照片后可查看预览</span></figure>
-        </section>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Echo Market - 发布闲置商品</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/product/productadd.css">
+</head>
+<body>
+<div class="publish-container">
+    <div class="publish-header">
+        <h2>发布闲置商品</h2>
+        <a class="back-link" href="${pageContext.request.contextPath}/products">返回商品列表</a>
+    </div>
+
+    <c:if test="${not empty msg}">
+        <div class="alert-msg">${msg}</div>
+    </c:if>
+
+    <form action="${pageContext.request.contextPath}/product/add" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>商品名称</label>
+            <input class="form-control" type="text" name="title" required />
+        </div>
+
+        <div class="form-group">
+            <label>价格</label>
+            <input id="priceInput" class="form-control" type="number" step="0.01" min="0.01" max="999999.99" name="price" required />
+        </div>
+
+        <script>
+            const priceInput = document.getElementById("priceInput");
+            const minPrice = 0.01;
+            const maxPrice = 999999.99;
+
+            priceInput.addEventListener("keydown", function (e) {
+                if (e.key === "-" || e.key === "+" || e.key === "e" || e.key === "E") {
+                    e.preventDefault();
+                }
+            });
+
+            priceInput.addEventListener("input", function () {
+                let val = priceInput.value;
+                if (val.includes(".")) {
+                    const parts = val.split(".");
+                    if (parts[1].length > 2) {
+                        priceInput.value = parts[0] + "." + parts[1].slice(0, 2);
+                    }
+                }
+            });
+
+            function normalizePrice() {
+                if (priceInput.value === "") return;
+                let val = parseFloat(priceInput.value);
+                if (isNaN(val) || val < minPrice) {
+                    priceInput.value = minPrice.toFixed(2);
+                } else if (val > maxPrice) {
+                    priceInput.value = maxPrice.toFixed(2);
+                }
+            }
+
+            priceInput.addEventListener("change", normalizePrice);
+            priceInput.addEventListener("blur", normalizePrice);
+        </script>
+
+        <div class="form-group">
+            <label>商品分类</label>
+            <select class="form-select" name="categoryId">
+                <c:forEach items="${categories}" var="c">
+                    <option value="${c.id}">${c.name}</option>
+                </c:forEach>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>选择商品图片</label>
+            <input class="form-file" type="file" name="imageFile" accept="image/*" required />
+        </div>
+
+        <div class="form-group">
+            <label>商品描述</label>
+            <textarea class="form-textarea" name="description"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn-submit" type="submit">确认发布</button>
+            <a class="btn-cancel" href="${pageContext.request.contextPath}/products">取消</a>
+        </div>
     </form>
-    <script src="<c:url value='/js/market/product-media.js'/>"></script>
-</market:layout>
+</div>
+</body>
+</html>

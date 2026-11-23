@@ -1,46 +1,118 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%--
+  Created by IntelliJ IDEA.
+  User: miku
+  Date: 2026/11/20
+  Time: 20:19
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ taglib prefix="market" tagdir="/WEB-INF/tags/market" %>
-<market:layout title="${empty product ? '商品详情' : product.title}" section="products" stylesheet="/css/market/products.css">
-    <a class="text-link crumb" href="<c:url value='/products'/>">← 返回商品列表</a>
-    <c:choose>
-        <c:when test="${empty product}">
-            <div class="empty"><h1>找不到这个商品</h1><p><c:out value="${msg}" default="请从商品列表选择要查看的商品。"/></p></div>
-        </c:when>
-        <c:otherwise>
-            <c:url var="ratingsUrl" value="/ratings"><c:param name="userId" value="${product.sellerId}"/></c:url>
-            <c:url var="buyUrl" value="/productbuy"><c:param name="productId" value="${product.id}"/></c:url>
-            <c:url var="messageUrl" value="/messagethread"><c:param name="otherId" value="${product.sellerId}"/><c:param name="productId" value="${product.id}"/></c:url>
-            <c:url var="reportUrl" value="/reportadd"><c:param name="targetType" value="2"/><c:param name="targetId" value="${product.id}"/></c:url>
-            <div class="columns detail-layout">
-                <figure class="product-media detail-photo"><market:productImage image="${product.image}" alt="${product.title}"/></figure>
-                <section class="panel detail-info">
-                    <div class="actions">
-                        <span class="tag"><c:out value="${empty product.categoryName ? '闲置商品' : product.categoryName}"/></span>
-                        <span class="tag state">${product.status eq 0 ? '待售' : product.status eq 1 ? '已售' : '已下架'}</span>
-                    </div>
-                    <header class="page-head"><h1><c:out value="${product.title}"/></h1></header>
-                    <p class="price"><small>¥</small> <fmt:formatNumber value="${product.price}" pattern="#,##0.00"/></p>
-                    <p class="description"><c:out value="${empty product.description ? '卖家还没有填写商品描述。' : product.description}"/></p>
-                    <div class="seller">
-                        <div><market:identity name="${empty product.sellerName ? '市集用户' : product.sellerName}"/>
-                            <p class="muted"><c:choose><c:when test="${sellerRateCount gt 0}"><fmt:formatNumber value="${sellerScore}" pattern="0.0"/> 分 · ${sellerRateCount} 条评价</c:when><c:otherwise>暂无评价</c:otherwise></c:choose></p>
-                        </div>
-                        <a class="text-link" href="<c:out value='${ratingsUrl}'/>">查看卖家评价</a>
-                    </div>
-                    <div class="actions detail-actions">
-                        <c:if test="${product.status eq 0 and (empty sessionScope.user or sessionScope.user.id ne product.sellerId)}"><a class="btn primary" href="<c:out value='${buyUrl}'/>">立即下单</a></c:if>
-                        <c:if test="${empty sessionScope.user or sessionScope.user.id ne product.sellerId}"><a class="btn" href="<c:out value='${messageUrl}'/>">联系卖家</a></c:if>
-                        <form action="<c:url value='/favoritetoggle'/>" method="post">
-                            <input type="hidden" name="productId" value="${product.id}">
-                            <button class="btn" type="submit" aria-pressed="${favorited eq true}">${favorited ? '取消收藏' : '收藏商品'}</button>
-                        </form>
-                        <a class="text-link" href="<c:out value='${reportUrl}'/>">举报商品</a>
-                    </div>
-                </section>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Echo Market - 商品详情</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/product/productdetail.css">
+</head>
+<body>
+<div class="detail-container">
+    <div class="detail-topbar">
+        <a class="back-link" href="${pageContext.request.contextPath}/products">← 返回商品列表</a>
+        <c:if test="${not empty product}">
+            <span class="product-id-badge">#${product.id}</span>
+        </c:if>
+    </div>
+
+    <c:if test="${not empty msg}">
+        <div class="empty-box">
+            <p class="empty-msg">${msg}</p>
+            <a class="btn btn-secondary" href="${pageContext.request.contextPath}/products">返回商品列表</a>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty product}">
+        <div class="detail-card">
+            <div class="detail-media">
+                <c:choose>
+                    <c:when test="${not empty product.image}">
+                        <img class="detail-image"
+                             src="${pageContext.request.contextPath}/images/${product.image}"
+                             alt="${product.title}">
+                    </c:when>
+                    <c:otherwise>
+                        <div class="image-placeholder">暂无图片</div>
+                    </c:otherwise>
+                </c:choose>
             </div>
-        </c:otherwise>
-    </c:choose>
-    <script src="<c:url value='/js/market/product-media.js'/>"></script>
-</market:layout>
+
+            <div class="detail-info">
+                <div class="detail-tags">
+                    <c:choose>
+                        <c:when test="${product.status == 0}">
+                            <span class="status-badge status-pending">待售</span>
+                        </c:when>
+                        <c:when test="${product.status == 1}">
+                            <span class="status-badge status-sold">已售</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="status-badge status-offline">已下架</span>
+                        </c:otherwise>
+                    </c:choose>
+                    <span class="meta-item">分类 ID：${product.categoryId}</span>
+                    <span class="meta-item">卖家：${seller.username}</span>
+                    <span class="meta-item">卖家评分：<fmt:formatNumber value="${sellerScore}" pattern="0.0"/> 分（${sellerRateCount} 条）</span>
+                    <a class="meta-link" href="${pageContext.request.contextPath}/ratings?userId=${product.sellerId}">看 TA 收到的评价</a>
+                </div>
+
+                <h1 class="detail-title">${product.title}</h1>
+
+                <div class="price-panel">
+                    <span class="price-label">商品价格</span>
+                    <span class="price-amount">¥ <fmt:formatNumber value="${product.price}" pattern="#,##0.00"/></span>
+                </div>
+
+                <div class="desc-panel">
+                    <h2 class="desc-heading">商品描述</h2>
+                    <p class="desc-content">
+                        <c:out value="${empty product.description ? '暂无详细描述' : product.description}"/>
+                    </p>
+                </div>
+
+                <div class="detail-actions">
+                    <c:choose>
+                        <c:when test="${product.status == 0}">
+                            <a class="btn btn-primary"
+                               href="${pageContext.request.contextPath}/productbuy?productId=${product.id}">立即下单
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="button" class="btn btn-disabled" disabled>当前状态不可下单</button>
+                        </c:otherwise>
+                    </c:choose>
+                    <a class="btn btn-secondary" href="${pageContext.request.contextPath}/products">继续浏览</a>
+
+                    <form action="${pageContext.request.contextPath}/favoritetoggle" method="post" class="inline-form">
+                        <input type="hidden" name="productId" value="${product.id}">
+                        <c:choose>
+                            <c:when test="${favorited}">
+                                <button class="btn btn-secondary" type="submit">取消收藏</button>
+                            </c:when>
+                            <c:otherwise>
+                                <button class="btn btn-secondary" type="submit">收藏这个商品</button>
+                            </c:otherwise>
+                        </c:choose>
+                    </form>
+
+                    <a class="btn btn-secondary"
+                       href="${pageContext.request.contextPath}/messagethread?otherId=${product.sellerId}&productId=${product.id}">联系卖家</a>
+
+                    <a class="btn btn-plain"
+                       href="${pageContext.request.contextPath}/reportadd?targetType=2&targetId=${product.id}">举报这个商品</a>
+                </div>
+            </div>
+        </div>
+    </c:if>
+</div>
+</body>
+</html>
