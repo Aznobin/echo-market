@@ -45,7 +45,7 @@
 
 默认以演示账号 `xiaoman` 浏览。头像菜单可打开举报处理或切换账号；例如用 `tang` 登录后，可以体验示例卖出订单（`xiaoman`）对应的买家视角。登录表单可填写任意示例密码，请不要填写真实凭据或联系方式。样板不连接 Servlet、数据库或支付服务，原 Java 项目不受影响。
 
-示例商品照片来自 [Unsplash](https://unsplash.com/license)，笔记本和明信片图片沿用原项目素材。
+示例商品照片来自 [Unsplash](https://unsplash.com/license)，笔记本和明信片图片沿用原项目素材。页面使用独立的本地适配器；七个业务模块的接入约定见[前端接口说明](frontend/README.md)。
 
 ## 本地运行
 

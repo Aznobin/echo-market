@@ -14,9 +14,7 @@
     const toast = document.querySelector('#toast');
     const dialog = document.querySelector('#confirm-dialog');
     let toastTimer, pending, observer;
-    let storage;
-    try { storage = localStorage; } catch { /* Demo can still run in memory. */ }
-    const api = window.EchoMarketMock.createMockApi({ storage });
+    const api = window.echoMarket;
     const categories = api.catalog.categories();
     const currentId = api.account.currentId;
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -269,7 +267,7 @@
       try {
         if (task === 'login' || task === 'register') {
           const account = { username: get('username'), nickname: get('nickname'), password: data.get('password'), confirmPassword: data.get('confirmPassword') };
-          const result = task === 'register' ? api.account.register(account) : api.account.login({ username: account.username });
+          const result = task === 'register' ? api.account.register(account) : api.account.login({ username: account.username, password: account.password });
           saveFeedback(task === 'register' ? '本机演示身份已建立' : '已登录到演示身份', result);
           const [, next, ...params] = currentRoute();
           return Object.hasOwn(views, next) && next !== 'login' && next !== 'register' ? go(next, ...params) : go('welcome');
