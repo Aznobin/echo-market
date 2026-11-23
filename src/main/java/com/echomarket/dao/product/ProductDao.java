@@ -53,7 +53,18 @@ public class ProductDao {
         return qr.query(sql, new BeanListHandler<>(Product.class), sellerId);
     }
 
+    // 修改商品资料
+    public int update(Product product) throws SQLException {
+        String sql = "update product set title = ?, description = ?, price = ?, category_id = ? " +
+                "where id = ? and seller_id = ? and status = 0";
+        return qr.update(sql, product.getTitle(), product.getDescription(), product.getPrice(),
+                product.getCategoryId(), product.getId(), product.getSellerId());
+    }
 
+    // 下架商品
+    public int remove(int id) throws SQLException {
+        return qr.update("update product set status = 2 where id = ? and status = 0", id);
+    }
 
     // 更新商品状态
     public int updateStatus(int id, int sellerId, int status) throws SQLException {
