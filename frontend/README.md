@@ -1,13 +1,13 @@
 # 回响市集前端接口
 
-根目录的 [`index.html`](../index.html) 是独立的 A 版前端入口，直接打开即可使用。此目录不包含 Servlet、JSP 或数据库改动，预览也不会向服务器发送请求。
+A 版挂在 [`src/main/webapp/index.jsp`](../src/main/webapp/index.jsp)，由 Tomcat 渲染 [市集视图](../src/main/webapp/WEB-INF/views/market/home.jsp)。业务数据由浏览器里的模拟适配器提供，不调用真实后端接口。
 
 ## 从哪里接入
 
-- [`fixtures.js`](fixtures.js)：无真实账号的演示数据。
-- [`mock-api.js`](mock-api.js)：本机模拟适配器，管理演示状态；保存失败时继续在内存中运行。它不保存表单密码。
-- [`api.js`](api.js)：检查适配器是否提供当前界面使用的方法。
-- [`bootstrap.js`](bootstrap.js)：唯一装配入口，当前只装配模拟适配器。页面代码通过 `window.echoMarket` 消费接口，不直接读写业务数据。
+- [`fixtures.js`](../src/main/webapp/js/market/fixtures.js)：无真实账号的演示数据。
+- [`mock-api.js`](../src/main/webapp/js/market/mock-api.js)：本机模拟适配器，管理演示状态；保存失败时继续在内存中运行。它不保存表单密码。
+- [`api.js`](../src/main/webapp/js/market/api.js)：检查适配器是否提供当前界面使用的方法。
+- [`bootstrap.js`](../src/main/webapp/js/market/bootstrap.js)：唯一装配入口，当前只装配模拟适配器。页面代码通过 `window.echoMarket` 消费接口，不直接读写业务数据。
 
 ## 页面依赖的接口
 
@@ -27,4 +27,4 @@
 
 ## 验证
 
-从仓库根目录运行 `node --test preview-smoke.test.cjs frontend/api.test.cjs`。测试不启动 Tomcat，不访问数据库，也不使用 CDP。
+从仓库根目录运行 `node --test tests/frontend/*.test.cjs`。这组测试不启动 Tomcat、不访问数据库，也不使用 CDP；要确认 JSP 和静态资源能从 WAR 载入，应另用 Tomcat 访问项目首页。
