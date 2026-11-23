@@ -186,7 +186,9 @@ CREATE TABLE `product` (
                            `seller_id` int NOT NULL COMMENT '卖家ID',
                            `status` int DEFAULT '0' COMMENT '0待售 / 1已售 / 2下架',
                            `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                           PRIMARY KEY (`id`)
+                           PRIMARY KEY (`id`),
+                           KEY `idx_seller_status` (`seller_id`,`status`),
+                           KEY `idx_status_update` (`status`,`update_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

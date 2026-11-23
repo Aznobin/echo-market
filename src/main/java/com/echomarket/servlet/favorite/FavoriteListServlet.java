@@ -1,9 +1,9 @@
 package com.echomarket.servlet.favorite;
 
-import com.echomarket.entity.favorite.Favorite;
-import com.echomarket.dao.favorite.FavoriteDao;
+import com.echomarket.entity.Favorite;
+import com.echomarket.dao.FavoriteDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/favorites")
+// 我的收藏页
 public class FavoriteListServlet extends HttpServlet {
     private final FavoriteDao favoriteDao = new FavoriteDao();
 
