@@ -81,9 +81,14 @@
 
                 <div class="detail-actions">
                     <c:choose>
-                        <c:when test="${product.status == 0}">
+                        <c:when test="${product.status == 0 and product.sellerId != sessionScope.user.id}">
                             <a class="btn btn-primary"
                                href="${pageContext.request.contextPath}/productbuy?productId=${product.id}">立即下单
+                            </a>
+                        </c:when>
+                        <c:when test="${product.status == 0}">
+                            <a class="btn btn-primary"
+                               href="${pageContext.request.contextPath}/product/manage?id=${product.id}">编辑商品
                             </a>
                         </c:when>
                         <c:otherwise>
