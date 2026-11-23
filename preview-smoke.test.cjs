@@ -6,8 +6,9 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 const read = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8');
-const script = read('preview.js');
 const html = read('index.html');
+const scripts = Array.from(html.matchAll(/<script src="([^"]+)"><\/script>/g), (m) => m[1]);
+const script = scripts.map(read).join('\n');
 
 function boot(hash = '', storage = new Map()) {
   const element = () => ({ dataset: {}, handler: {}, innerHTML: '', firstElementChild: {},
