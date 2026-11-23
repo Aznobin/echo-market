@@ -13,7 +13,7 @@ public class UserDao {
 
     // 查询登录用户
     public User findByUsername(String username) throws SQLException {
-        String sql = "select id, username, password, create_time as createTime, status, role "
+        String sql = "select id, username, password, nickname, phone, avatar, create_time as createTime, status, role "
                    + "from user where username = ?";
         return qr.query(sql, new BeanHandler<>(User.class), username);
     }
@@ -26,12 +26,20 @@ public class UserDao {
 
     // 查询用户资料
     public User findById(int id) throws SQLException {
-        String sql = "select id, username, password, create_time as createTime, status, role "
+        String sql = "select id, username, password, nickname, phone, avatar, create_time as createTime, status, role "
                    + "from user where id = ?";
         return qr.query(sql, new BeanHandler<>(User.class), id);
     }
 
+    // 更新用户资料
+    public int updateProfile(int id, String nickname, String phone, String avatar) throws SQLException {
+        return qr.update("update user set nickname = ?, phone = ?, avatar = ? where id = ?", nickname, phone, avatar, id);
+    }
 
+    // 更新用户密码
+    public int updatePassword(int id, String password) throws SQLException {
+        return qr.update("update user set password = ? where id = ?", password, id);
+    }
 
     // 查询手机号对应用户
     public User findByPhone(String phone) throws SQLException {
