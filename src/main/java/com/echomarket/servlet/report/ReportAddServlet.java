@@ -1,9 +1,9 @@
 package com.echomarket.servlet.report;
 
-import com.echomarket.entity.report.Report;
-import com.echomarket.dao.report.ReportDao;
+import com.echomarket.entity.Report;
+import com.echomarket.dao.ReportDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/reportadd")
+// 提交举报
 public class ReportAddServlet extends HttpServlet {
     private final ReportDao reportDao = new ReportDao();
 
@@ -50,6 +51,7 @@ public class ReportAddServlet extends HttpServlet {
             return;
         }
 
+        // 获取举报内容
         String reason = req.getParameter("reason");
         if (reason == null) {
             reason = "";
@@ -68,6 +70,7 @@ public class ReportAddServlet extends HttpServlet {
         }
 
         try {
+            // 保存举报
             Report r = new Report();
             r.setReporterId(user.getId());
             r.setTargetType(targetType);

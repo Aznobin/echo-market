@@ -3,10 +3,10 @@ package com.echomarket.servlet.product;
 import com.echomarket.entity.product.Product;
 import com.echomarket.dao.product.ProductDao;
 
-import com.echomarket.dao.favorite.FavoriteDao;
-import com.echomarket.dao.rating.RatingDao;
-import com.echomarket.dao.account.UserDao;
-import com.echomarket.entity.account.User;
+import com.echomarket.dao.FavoriteDao;
+import com.echomarket.dao.RatingDao;
+import com.echomarket.dao.UserDao;
+import com.echomarket.entity.User;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet("/productdetail")
+// 商品详情页
 public class ProductDetailServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
     private final RatingDao ratingDao = new RatingDao();
