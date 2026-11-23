@@ -39,6 +39,14 @@
 
 浏览器请求由 Servlet 接收。Servlet 通过 DAO 读写 MySQL，再把页面数据交给 JSP 渲染。下单时，数据库事务把检查商品状态、标记商品和创建订单放在一起，防止同一件商品被重复购买。
 
+## 静态 UI 样板
+
+直接双击仓库根目录的 [`index.html`](index.html) 即可预览全部界面。样板只使用 HTML、CSS、原生 JavaScript 和本地图片，不需要联网、安装依赖或启动 Tomcat。默认是亮色，右上角可切换暗色；浏览器允许本地存储时会记住选择和演示操作。
+
+默认以演示账号 `xiaoman` 浏览。头像菜单可打开举报处理或切换账号；例如用 `tang` 登录后，可以体验示例卖出订单（`xiaoman`）对应的买家视角。登录表单可填写任意示例密码，请不要填写真实凭据或联系方式。样板不连接 Servlet、数据库或支付服务，原 Java 项目不受影响。
+
+示例商品照片来自 [Unsplash](https://unsplash.com/license)，笔记本和明信片图片沿用原项目素材。
+
 ## 本地运行
 
 1. 准备 JDK 21、Tomcat 10.1 和 MySQL 8。将 [`database/init.sql`](database/init.sql) 导入独立的本地演示库；脚本会重建 `echo_market` 下的同名表，不要对已有业务数据的环境执行。

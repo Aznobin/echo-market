@@ -1,59 +1,32 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>Echo Market - 注册</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/account/register.css">
-</head>
-<body>
-<div class="register-wrap">
-    <div class="register-card">
-        <h2 class="register-title">Echo Market 二手集市 · 注册</h2>
-        <p class="msg"><%= request.getAttribute("msg") == null ? "" : request.getAttribute("msg") %></p>
-        <form action="register" method="post">
-            <div class="form-row">
-                <label for="username">用户名</label>
-                <input type="text" id="username" name="username" maxlength="32" pattern=".{3,32}"
-                       title="用户名 3~32 个字符" placeholder="用来登录（3~32 个字符）" required>
-            </div>
-            <div class="form-row">
-                <label for="nickname">昵称</label>
-                <input type="text" id="nickname" name="nickname" maxlength="32" placeholder="展示在商品和订单上" required>
-            </div>
-            <div class="form-row">
-                <label for="phone">手机号</label>
-                <input type="tel" id="phone" name="phone" maxlength="11" pattern="1[3-9][0-9]{9}"
-                       title="请填写手机号" placeholder="11 位手机号" required>
-            </div>
-            <div class="form-row">
-                <label for="password">密码</label>
-                <input type="password" id="password" name="password" minlength="6" maxlength="64"
-                       placeholder="至少 6 位" required>
-            </div>
-            <div class="form-row">
-                <label for="confirmPassword">确认密码</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" maxlength="64" placeholder="再输一次密码" required>
-            </div>
-            <label class="agree-row">
-                <input type="checkbox" name="agree" value="1" required>
-                我已阅读并同意《用户协议》
-            </label>
-            <button class="register-btn" type="submit">注册</button>
-        </form>
-        <p class="tip">已有账号？<a href="login.jsp">去登录</a></p>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="market" tagdir="/WEB-INF/tags/market" %>
+<market:layout title="注册" stylesheet="/css/market/account.css">
+    <div class="columns account-layout">
+        <aside class="panel account-intro">
+            <p>回响市集 · EchoMarket</p>
+            <strong>把闲置留给<br>用得上的同学。</strong>
+            <p class="muted">昵称是其他同学在市集里看到的名字。</p>
+            <market:identity name="你的昵称"/>
+        </aside>
+        <section class="panel account-panel" aria-labelledby="account-title">
+            <header class="page-head"><h1 id="account-title">创建账号</h1><p>填写下面的信息，开始逛市集。</p></header>
+            <c:if test="${not empty msg}"><p class="notice" role="alert"><c:out value="${msg}"/></p></c:if>
+            <form class="form" action="<c:url value='/register'/>" method="post" id="register-form">
+                <div class="form-row">
+                    <label class="field">用户名<input name="username" maxlength="32" pattern=".{3,32}" autocomplete="username" placeholder="3–32 个字符" required></label>
+                    <label class="field">昵称<input name="nickname" maxlength="32" autocomplete="nickname" required></label>
+                </div>
+                <label class="field">手机号<input type="tel" name="phone" maxlength="11" pattern="1[3-9][0-9]{9}" autocomplete="tel-national" inputmode="tel" required></label>
+                <div class="form-row">
+                    <label class="field">密码<input type="password" name="password" minlength="6" maxlength="64" autocomplete="new-password" required><small>至少 6 个字符</small></label>
+                    <label class="field">确认密码<input type="password" name="confirmPassword" maxlength="64" autocomplete="new-password" required></label>
+                </div>
+                <label class="account-agree"><input type="checkbox" name="agree" value="1" required> 我已阅读并同意《用户协议》</label>
+                <button class="btn primary" type="submit">注册</button>
+            </form>
+            <p class="muted account-switch">已有账号？<a class="text-link" href="<c:url value='/login.jsp'/>">去登录</a></p>
+        </section>
     </div>
-</div>
-
-<script>
-    document.querySelector("form").addEventListener("submit", function (e) {
-        var pwd = document.getElementById("password").value;
-        var confirmPwd = document.getElementById("confirmPassword").value;
-        if (pwd !== confirmPwd) {
-            e.preventDefault();
-            alert("两次输入的密码不一致");
-        }
-    });
-</script>
-</body>
-</html>
+    <script src="<c:url value='/js/market/register.js'/>"></script>
+</market:layout>

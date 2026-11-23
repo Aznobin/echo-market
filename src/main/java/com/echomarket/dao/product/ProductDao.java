@@ -12,11 +12,14 @@ import java.util.List;
 
 public class ProductDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
+    private static final String PRODUCT_VIEW = "select p.id, p.title, p.description, p.price, p.image, " +
+            "p.category_id as categoryId, p.seller_id as sellerId, p.status, p.update_time as updateTime, " +
+            "c.name as categoryName, coalesce(nullif(trim(u.nickname), ''), u.username) as sellerName " +
+            "from product p left join category c on c.id = p.category_id " +
+            "left join `user` u on u.id = p.seller_id ";
+
     public List<Product> findAllOnSale() throws SQLException {
-        String sql = "select id, title, description, price, image, " +
-                "category_id as categoryId, seller_id as sellerId, " +
-                "status, update_time as updateTime " +
-                "from product where status = 0 order by update_time desc";
+        String sql = PRODUCT_VIEW + "where p.status = 0 order by p.update_time desc, p.id desc";
         return qr.query(sql,new BeanListHandler<>(Product.class));
     }
 
@@ -35,10 +38,7 @@ public class ProductDao {
     }
 
     public Product findById(int id) throws SQLException {
-        String sql = "select id, title, description, price, image, " +
-                "category_id as categoryId, seller_id as sellerId, " +
-                "status, update_time as updateTime " +
-                "from product where id = ?";
+        String sql = PRODUCT_VIEW + "where p.id = ?";
         return qr.query(sql, new BeanHandler<>(Product.class), id);
     }
 

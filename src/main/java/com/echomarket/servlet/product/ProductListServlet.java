@@ -3,7 +3,6 @@ package com.echomarket.servlet.product;
 import com.echomarket.entity.product.Product;
 import com.echomarket.dao.product.ProductDao;
 
-import com.sun.net.httpserver.Request;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,12 +19,14 @@ public class ProductListServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    try {
-        List<Product> productList = productDao.findAllOnSale();
-        req.setAttribute("products", productList);
+        try {
+            List<Product> productList = productDao.findAllOnSale();
+            req.setAttribute("products", productList);
+        } catch (SQLException e) {
+            log("查询在售商品失败", e);
+            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            req.setAttribute("msg", "暂时无法加载商品，请稍后刷新再试。");
+        }
         req.getRequestDispatcher("/products.jsp").forward(req, resp);
-    } catch (SQLException e){
-        e.printStackTrace();
-    }
     }
 }

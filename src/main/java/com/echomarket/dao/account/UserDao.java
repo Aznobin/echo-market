@@ -12,7 +12,7 @@ public class UserDao {
     private final QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
 
     public User findByUsername(String username) throws SQLException {
-        String sql = "select id, username, password, create_time as createTime, status, role "
+        String sql = "select id, username, nickname, password, create_time as createTime, status, role "
                    + "from user where username = ?";
         return qr.query(sql, new BeanHandler<>(User.class), username);
     }
@@ -23,7 +23,7 @@ public class UserDao {
     }
 
     public User findById(int id) throws SQLException {
-        String sql = "select id, username, password, create_time as createTime, status, role "
+        String sql = "select id, username, nickname, password, create_time as createTime, status, role "
                    + "from user where id = ?";
         return qr.query(sql, new BeanHandler<>(User.class), id);
     }
