@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
 <html lang="zh-CN" data-theme="light">
 <head>
@@ -5,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="回响市集校园二手交易平台的静态前端样板。">
   <title>浏览商品 · 回响市集</title>
-  <script src="frontend/fixtures.js"></script>
-  <script src="frontend/mock-api.js"></script>
-  <script src="frontend/api.js"></script>
-  <script src="frontend/bootstrap.js"></script>
-  <script src="preview.js"></script>
-  <link rel="stylesheet" href="preview.css">
+  <script src="<c:url value='/js/market/fixtures.js'/>"></script>
+  <script src="<c:url value='/js/market/mock-api.js'/>"></script>
+  <script src="<c:url value='/js/market/api.js'/>"></script>
+  <script src="<c:url value='/js/market/bootstrap.js'/>"></script>
+  <script src="<c:url value='/js/market/market.js'/>"></script>
+  <link rel="stylesheet" href="<c:url value='/css/market/market.css'/>">
 </head>
 <body>
   <header class="navbar">

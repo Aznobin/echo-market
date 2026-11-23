@@ -1,13 +1,14 @@
-// Run with Node 22+: node --test --test-isolation=none preview-smoke.test.cjs
-// Exercises the HTML/JS contract without a server, external packages, or browser control.
+// Run with Node 22+: node --test tests/frontend/*.test.cjs
+// Exercises the JSP shell and client routes without external packages or browser control.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const read = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8');
-const html = read('index.html');
-const scripts = Array.from(html.matchAll(/<script src="([^"]+)"><\/script>/g), (m) => m[1]);
+const webapp = path.resolve(__dirname, '../../src/main/webapp');
+const read = (file) => fs.readFileSync(path.join(webapp, file), 'utf8');
+const html = read('WEB-INF/views/market/home.jsp');
+const scripts = Array.from(html.matchAll(/<script src="<c:url value='\/([^']+)'\/>"/g), (m) => m[1]);
 const script = scripts.map(read).join('\n');
 
 function boot(hash = '', storage = new Map()) {
@@ -54,13 +55,17 @@ function boot(hash = '', storage = new Map()) {
   };
 }
 
-test('standalone entry reaches all original UI surfaces and local assets', () => {
+test('JSP entry reaches all UI surfaces and packaged local assets', () => {
   const app = boot();
+  assert.match(read('index.jsp'), /<jsp:forward page="\/WEB-INF\/views\/market\/home\.jsp"\/>/);
+  assert.equal(scripts.length, 5);
   assert.equal(app.theme(), 'light');
   assert.match(app.view(), /校园好物/);
-  for (const asset of [...html.matchAll(/(?:src|href)="([^"#]+\.(?:js|css))"/g), ...script.matchAll(/'(\.\/[^']+\.(?:jpg|png))'/g)]) {
-    assert.ok(fs.existsSync(path.join(__dirname, asset[1])), asset[1]);
-  }
+  const styles = Array.from(html.matchAll(/href="<c:url value='\/([^']+\.css)'\/>"/g), (m) => m[1]);
+  const images = Array.from(read('js/market/fixtures.js').matchAll(/'(\.\/[^']+\.(?:jpg|png))'/g), (m) => m[1]);
+  assert.equal(styles.length, 1);
+  assert.equal(images.length, 9);
+  for (const asset of [...scripts, ...styles, ...images]) assert.ok(fs.existsSync(path.join(webapp, asset)), asset);
   for (const [route, title] of Object.entries({
     'productdetail/101': '商品详情', productadd: '发布闲置商品', favorites: '我的收藏',
     messages: '消息中心', 'messagethread/yan/101': '还在。可以呀', myorders: '我买到的订单',

@@ -10,7 +10,14 @@
     let state = createData();
     try {
       const saved = JSON.parse(storage?.getItem(key) ?? 'null');
-      if (saved && ['products', 'threads', 'orders', 'ratings', 'reports'].every((k) => Array.isArray(saved[k])) && saved.accounts && saved.favorites) state = saved;
+      if (saved && ['products', 'threads', 'orders', 'ratings', 'reports'].every((k) => Array.isArray(saved[k])) && saved.accounts && saved.favorites) {
+        for (const product of saved.products) {
+          if (typeof product.image !== 'string') continue;
+          product.image = product.image.replace(/^\.\/preview-assets\//, './images/market/')
+            .replace(/^\.\/src\/main\/webapp\/images\//, './images/');
+        }
+        state = saved;
+      }
     } catch { /* Unavailable or invalid storage starts a clean demo. */ }
     const copy = (value) => value == null ? value : JSON.parse(JSON.stringify(value));
     const timestamp = () => new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(now());

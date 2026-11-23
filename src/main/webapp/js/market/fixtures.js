@@ -9,11 +9,11 @@
     };
     const categories = ['教材书籍', '电子数码', '生活用品', '服饰鞋包', '运动器材', '美妆个护', '其他闲置'];
     const photos = {
-      headphones: './preview-assets/headphones.jpg', camera: './preview-assets/camera.jpg',
-      books: './preview-assets/books.jpg', sneakers: './preview-assets/sneakers.jpg',
-      lamp: './preview-assets/lamp.jpg', bicycle: './preview-assets/bicycle.jpg',
-      bag: './preview-assets/bag.jpg', laptop: './src/main/webapp/images/HUAWEI_MateBook_14.png',
-      illustration: './src/main/webapp/images/115411842_p0.jpg',
+      headphones: './images/market/headphones.jpg', camera: './images/market/camera.jpg',
+      books: './images/market/books.jpg', sneakers: './images/market/sneakers.jpg',
+      lamp: './images/market/lamp.jpg', bicycle: './images/market/bicycle.jpg',
+      bag: './images/market/bag.jpg', laptop: './images/HUAWEI_MateBook_14.png',
+      illustration: './images/115411842_p0.jpg',
     };
     const product = (id, title, price, categoryId, image, seller, description, sold = false) => ({ id, title, price, categoryId, image: photos[image], kind: image, seller, description, sold });
     const createData = () => ({
