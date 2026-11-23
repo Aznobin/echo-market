@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/productbuy")
+// 填写订单信息页
 public class OrderBuyerInfoServlet extends HttpServlet {
     private final ProductDao productDao = new ProductDao();
 
