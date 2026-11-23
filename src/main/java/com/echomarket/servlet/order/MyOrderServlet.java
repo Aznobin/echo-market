@@ -1,9 +1,9 @@
 package com.echomarket.servlet.order;
 
-import com.echomarket.entity.order.Order;
-import com.echomarket.dao.order.OrderDao;
+import com.echomarket.entity.Order;
+import com.echomarket.dao.OrderDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/myorders")
+// 我买到的订单页
 public class MyOrderServlet extends HttpServlet {
     private final OrderDao orderDao = new OrderDao();
 
