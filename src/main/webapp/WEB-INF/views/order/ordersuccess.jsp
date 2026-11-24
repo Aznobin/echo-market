@@ -17,7 +17,7 @@
 <body>
 <main class="checkout-container">
     <div class="empty-box">
-        <h2 class="panel-title" style="margin-bottom: 12px;">订单已提交</h2>
+        <h2 class="panel-title" style="margin-bottom: 12px;">购买成功</h2>
         <c:choose>
             <c:when test="${not empty sessionScope.lastOrder}">
                 <p class="empty-msg">订单编号：<strong>${sessionScope.lastOrder.orderNo}</strong></p>

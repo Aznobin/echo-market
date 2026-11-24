@@ -58,6 +58,7 @@
       }),
       favorites: Object.freeze({
         ids: () => { try { return call('favorites'); } catch { return []; } },
+        list: () => call('favoriteproducts'),
         toggle: (productId) => ({ value: call('favorite', { id: productId }), persisted: true }),
       }),
       messages: Object.freeze({
@@ -85,7 +86,7 @@
       }),
       ratings: Object.freeze({
         forUser: (id) => { try { return call('ratings', { user: id }); } catch { return []; } },
-        forOrder: () => [],
+        forOrder: (id) => call('orderratings', { id }),
         create({ orderId, score, content }) {
           call('rating', { order: orderId, score, content }, 'POST');
           return { value: true, persisted: true };
