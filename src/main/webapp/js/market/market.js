@@ -44,16 +44,19 @@
     const photo = (p, classes = '', lazy = false) => `${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.title)}"${lazy ? ' loading="lazy"' : ''}>` : '<span class="photo-empty">暂无商品图片</span>'}`;
     const media = (p, classes = '') => `<div class="product-media ${p.kind || ''} ${classes}">${photo(p)}</div>`;
     const savedIds = api.favorites.ids;
-    const heart = (p, compact) => {
-      const saved = savedIds().includes(p.id);
+    const heart = (p, compact, saved = savedIds().includes(p.id)) => {
       return `<button type="button" class="${compact ? 'heart' : 'btn'}" data-action="favorite" data-value="${esc(p.id)}" data-compact="${compact}" aria-pressed="${saved}" aria-label="${esc((saved ? '取消收藏：' : '收藏：') + p.title)}">${compact ? (saved ? '♥' : '♡') : (saved ? '取消收藏' : '收藏商品')}</button>`;
     };
-    const productGrid = (items) => `<div class="product-grid">${items.map((p, i) => `<article class="product-card" data-reveal style="--delay:${i % 4 * 45}ms"><a class="product-media ${p.kind || ''}" href="${route('productdetail', p.id)}">${photo(p, '', i >= 4)}</a><div class="card-copy"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${money(p.price)}</div><h3>${link(p.title, route('productdetail', p.id), '')}</h3><div class="card-bottom">${identity(p.seller, 'mini')}${heart(p, true)}</div></div></article>`).join('')}</div>`;
+    const productStatus = (p) => p.status === 2 ? '已下架' : p.sold ? '已售出' : '在售';
+    const productGrid = (items, favorites = false) => {
+      const saved = new Set(favorites ? items.map((p) => p.id) : savedIds());
+      return `<div class="product-grid">${items.map((p, i) => `<article class="product-card" data-reveal style="--delay:${i % 4 * 45}ms"><a class="product-media ${p.kind || ''}" href="${route('productdetail', p.id)}">${photo(p, '', i >= 4)}</a><div class="card-copy"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${money(p.price)}</div><h3>${link(p.title, route('productdetail', p.id), '')}</h3><div class="card-bottom">${identity(p.seller, 'mini')}${heart(p, true, saved.has(p.id))}</div>${favorites && p.sold ? tag(productStatus(p)) : ''}</div></article>`).join('')}</div>`;
+    };
 
     function market(favorites = false) {
       if (favorites) {
-        const items = api.catalog.list().filter((p) => savedIds().includes(p.id));
-        return head('我的收藏', '留待下次再看的校园闲置。') + (items.length ? productGrid(items) : empty('暂时没有收藏', '在商品图片下点一下爱心，就能在这里找到它。', browse()));
+        const items = api.favorites.list();
+        return head('我的收藏', '留待下次再看的校园闲置。') + (items.length ? productGrid(items, true) : empty('暂时没有收藏', '在商品图片下点一下爱心，就能在这里找到它。', browse()));
       }
       const items = api.catalog.list({ availableOnly: true });
       return `<section class="hero"><div class="hero-copy enter"><p class="kicker">CAMPUS SECONDHAND</p><h1>校园好物，<em>接着用。</em></h1><p>把用不到的留给需要的人，在校园里见个面。</p></div><div class="hero-art" aria-hidden="true"><div class="stamp"><div><span>ECHO MARKET</span>校园交换站<span>CAMPUS MARKET</span></div></div></div></section><section aria-labelledby="market-title"><div class="section-heading"><h2 id="market-title">正在上架</h2><small>${items.length} 件在售闲置</small></div>${items.length ? productGrid(items) : empty('暂时没有在售闲置', '你可以发布一件闲置，让它回到校园里。', link('发布闲置', route('productadd'), 'btn primary'))}</section>`;
@@ -62,7 +65,7 @@
     function productDetail(p) {
       if (!p) return notFound('找不到这件商品');
       const mine = p.seller === currentId();
-      return head('商品详情', '', back('返回市集', route('products'))) + `<div class="columns detail-layout">${media(p, 'detail-photo')}<section class="panel detail-info"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${tag(p.sold ? '已售出' : '在售', !p.sold)}</div><h2 style="margin-top:12px">${esc(p.title)}</h2>${money(p.price)}<h3>商品描述</h3><p class="description">${esc(p.description || '卖家还没有填写商品描述。')}</p><div class="seller">${identity(p.seller, 'large')}${link('收到的评价', route('ratings', p.seller))}</div><div class="actions">${!p.sold && !mine ? link('立即购买', route('orderbuyerinfo', p.id), 'btn primary') : ''}${!mine ? link('联系卖家', route('messagethread', p.seller, p.id), 'btn') : ''}${heart(p, false)}</div>${!mine ? `<div class="actions">${link('举报商品', route('reportadd', '2', p.id))}${link('举报用户', route('reportadd', '1', p.seller))}</div>` : '<p class="subtext" style="margin-top:12px">这是你发布的闲置。</p>'}</section></div>`;
+      return head('商品详情', '', back('返回市集', route('products'))) + `<div class="columns detail-layout">${media(p, 'detail-photo')}<section class="panel detail-info"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${tag(productStatus(p), !p.sold)}</div><h2 style="margin-top:12px">${esc(p.title)}</h2>${money(p.price)}<h3>商品描述</h3><p class="description">${esc(p.description || '卖家还没有填写商品描述。')}</p><div class="seller">${identity(p.seller, 'large')}${link('收到的评价', route('ratings', p.seller))}</div><div class="actions">${!p.sold && !mine ? link('立即购买', route('orderbuyerinfo', p.id), 'btn primary') : ''}${!mine ? link('联系卖家', route('messagethread', p.seller, p.id), 'btn') : ''}${heart(p, false)}</div>${!mine ? `<div class="actions">${link('举报商品', route('reportadd', '2', p.id))}${link('举报用户', route('reportadd', '1', p.seller))}</div>` : '<p class="subtext" style="margin-top:12px">这是你发布的闲置。</p>'}</section></div>`;
     }
 
     function publishPage() {
@@ -81,9 +84,10 @@
       const valid = Boolean(other && productId) && api.messages.canOpen(other, productId);
       const active = valid ? api.messages.open(other, productId) : null;
       const list = api.messages.list();
+      const unreadCount = list.reduce((total, t) => total + (t.unreadCount || 0), 0);
       const sidebar = list.map((t) => `<a class="chat-link" href="${route('messagethread', t.other, t.productId)}"${valid && t.other === other && t.productId === productId ? ' aria-current="page"' : ''}>${avatar(t.other)}<div><strong>${esc(name(t.other))}</strong><p>${esc(listing(t.productId)?.title || '商品')} · ${esc(t.last || t.items?.at(-1)?.text || '')}</p></div>${t.unread ? '<span class="unread" role="img" aria-label="未读"></span>' : ''}</a>`).join('');
       const conversation = valid ? `<div class="chat-head">${identity(other)}${link(p.title, route('productdetail', p.id))}</div><div class="chat-log enter">${active?.items.length ? active.items.map((m) => `<div class="message${m.from === currentId() ? ' mine' : ''}">${avatar(m.from, 'mini')}<div><p class="subtext chat-meta">${esc(name(m.from))} · ${esc(m.time)}</p><p class="bubble">${esc(m.text)}</p></div></div>`).join('') : '<p class="muted">还没有消息。可以先问问商品状态或方便交接的时间。</p>'}</div><form class="compose" data-form="message"><input type="hidden" name="otherId" value="${esc(other)}"><input type="hidden" name="productId" value="${esc(p.id)}">${field('消息内容', '<textarea name="content" rows="2" maxlength="500" placeholder="写给对方的话…" required></textarea>')}<button type="submit" class="btn primary">发送</button></form>${errorLine}` : empty(other ? '找不到这段会话' : '还没选中会话', '从左侧选择一段对话，或在商品详情里联系卖家。', list.length ? '' : browse());
-      return head('消息中心', '和同学确认商品细节、面交地点与时间。') + `<div class="chat"><aside class="chat-list" aria-label="会话列表"><h2>会话</h2>${sidebar || '<p class="subtext">暂无会话</p>'}</aside><section class="conversation" aria-label="聊天内容">${conversation}</section></div>`;
+      return head('消息中心', '和同学确认商品细节、面交地点与时间。') + (unreadCount ? notice(`你有 ${unreadCount} 条未读消息`) : '') + `<div class="chat"><aside class="chat-list" aria-label="会话列表"><h2>会话</h2>${sidebar || '<p class="subtext">暂无会话</p>'}</aside><section class="conversation" aria-label="聊天内容">${conversation}</section></div>`;
     }
 
     function orderList(seller, filter = 'all') {
@@ -108,13 +112,13 @@
       const seller = o.seller === currentId();
       const list = route(seller ? 'soldorders' : 'myorders');
       const counterpart = seller ? o.buyer : o.seller;
-      if (success) return `<section class="panel success">${tag('订单已提交', true)}${head('订单已提交', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
+      if (success) return `<section class="panel success">${tag('支付成功！', true)}${head('订单已提交！', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
       const current = o.status;
       const next = !seller && current === 0 ? ['我已支付', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
       const guidance = current === 0 ? (seller ? '等待买家付款。' : '你可以付款或取消订单。') : current === 1 ? (seller ? '与买家约定交接，并在交接后标记已发货。' : '等待卖家交接。你可以通过消息确认时间。') : current === 2 ? (seller ? '等待买家确认收货。' : '请在检查商品后确认收货。') : current === 3 ? '交易已完成，双方可以互相评价。' : '这笔订单已取消。';
-      const ratings = api.ratings.forOrder(o.id);
+      const { items: ratings, hasReviewed } = current === 3 ? api.ratings.forOrder(o.id) : { items: [], hasReviewed: false };
       const flow = current === 4 ? '' : `<ol class="steps" aria-label="订单进度">${orderStatus.slice(0, 4).map((s, i) => `<li class="tag${i === current ? ' current' : ''}"${i === current ? ' aria-current="step"' : ''}>${i + 1}. ${s}</li>`).join('')}</ol>`;
-      const ratingForm = !ratings.some((r) => r.from === currentId()) ? `<form class="form" data-form="rating"><input type="hidden" name="orderId" value="${esc(o.id)}">${field('评分', '<select name="score"><option value="5">5 分</option><option value="4">4 分</option><option value="3">3 分</option><option value="2">2 分</option><option value="1">1 分</option></select>')}${field('评价内容（选填）', '<textarea name="content" rows="3" maxlength="255"></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交评价</button></div></form>` : '<p class="subtext">你已评价过这笔订单。</p>';
+      const ratingForm = !hasReviewed ? `<form class="form" data-form="rating"><input type="hidden" name="orderId" value="${esc(o.id)}">${field('评分', '<select name="score"><option value="5">5 分</option><option value="4">4 分</option><option value="3">3 分</option><option value="2">2 分</option><option value="1">1 分</option></select>')}${field('评价内容（选填）', '<textarea name="content" rows="3" maxlength="255"></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交评价</button></div></form>` : '<p class="subtext">你已评价过这笔订单。</p>';
       return head('订单详情', `订单 EM${o.id} · ${o.time}`, back('返回订单列表', list)) + `<div class="columns"><div class="stack"><section class="panel"><div class="card-top"><h2>当前进度</h2>${tag(orderStatus[current], current < 3)}</div>${flow}<p>${esc(guidance)}</p><div class="actions">${next ? button(next[0], `order-${next[1]}`, o.id, true) : ''}${current < 2 ? button('取消订单', 'order-cancel', o.id) : ''}${p ? link(seller ? '联系买家' : '联系卖家', route('messagethread', counterpart, p.id), 'btn') : ''}</div></section><section class="panel"><h2>交接与付款信息</h2><dl class="info"><dt>交接方式</dt><dd>${esc(deliveryLabel[o.deliveryType])}</dd><dt>联系人</dt><dd>${esc(o.receiverName)}</dd><dt>联系电话</dt><dd>${esc(o.phone)}</dd><dt>交接地点</dt><dd>${esc(o.address)}</dd><dt>支付方式</dt><dd>${esc(payLabel[o.payMethod])}</dd><dt>订单备注</dt><dd>${esc(o.remark || '未填写')}</dd></dl></section>${current === 3 ? `<section class="panel stack"><h2>这笔订单的评价</h2>${ratings.map(ratingRecord).join('')}${ratingForm}</section>` : ''}</div><aside class="panel"><h2>订单商品</h2><div class="summary-product">${p ? media(p) : ''}<div><strong>${p ? link(p.title, route('productdetail', p.id)) : '商品'}</strong><div class="subtext">${seller ? '买家' : '卖家'}：${identity(counterpart, 'mini')}</div></div></div><div class="total"><span>合计</span>${money(o.amount)}</div></aside></div>`;
     }
 
@@ -298,7 +302,7 @@
           if (!p || p.sold || p.seller === currentId()) return formError(form, '该商品不能下单。');
           if (!get('receiverName') || !get('phone') || !get('address')) return formError(form, '请完整填写校内交接信息。');
           const payload = Object.fromEntries(['productId', 'receiverName', 'phone', 'address', 'remark', 'deliveryType', 'payMethod'].map((key) => [key, get(key)]));
-          confirmAction('确认购买', '确认提交这笔订单？', () => {
+          confirmAction('确认购买', '确认支付这笔订单？', () => {
             try {
               const result = api.orders.create(payload);
               saveFeedback('订单已提交', result);
