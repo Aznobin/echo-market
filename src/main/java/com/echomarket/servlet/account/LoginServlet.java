@@ -56,7 +56,7 @@ public class LoginServlet extends HttpServlet {
             }
             req.getSession().setAttribute("user", user);
 
-            resp.sendRedirect(req.getContextPath() + "/products");
+            resp.sendRedirect(req.getContextPath() + "/");
         } catch (SQLException e) {
             throw new ServletException("查询用户失败", e);
         }
