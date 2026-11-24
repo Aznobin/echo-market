@@ -19,7 +19,7 @@
 
 ## 示例数据
 
-初始化脚本包含 50 件商品、20 余笔订单、消息、评价和举报记录，账号有 `admin`（管理员）、`d`、`testuser` 三个，密码与用户名相同。商品图片来自公开商品示例接口，统一存放在 [`src/main/webapp/images/seed/`](src/main/webapp/images/seed)，名称和价格已整理为中文校园闲置风格。
+初始化脚本分两部分：[`init.sql`](database/init.sql) 只建表，[`seed.sql`](database/seed.sql) 写入示例数据。示例数据包含 50 件商品、20 余笔订单、消息、评价和举报记录，账号有 `admin`（管理员）、`d`、`testuser` 三个，密码与用户名相同。商品图片来自公开商品示例接口，统一存放在 [`src/main/webapp/images/seed/`](src/main/webapp/images/seed)，名称和价格已整理为中文校园闲置风格。
 
 ## 技术栈与结构
 
@@ -28,7 +28,8 @@
 - MySQL 8、c3p0 连接池、Apache Commons DbUtils
 
 ```text
-├── database/init.sql            # 建表及示例数据
+├── database/init.sql            # 建表脚本（空库结构）
+├── database/seed.sql            # 示例数据
 ├── src/main/java/com/echomarket/
 │   ├── servlet/                 # 路由、表单处理与页面跳转
 │   ├── filter/                  # 登录检查
@@ -52,8 +53,8 @@
 
 ## 本地运行
 
-1. 准备 JDK 21 和 Tomcat 10.1。只看新版前端可以跳过数据库配置。
-2. 如需运行原业务页面，把 [`database/init.sql`](database/init.sql) 导入独立的 MySQL 8 演示库，再将 [`c3p0.properties.example`](src/main/resources/c3p0.properties.example) 复制为同目录下的 `c3p0.properties`，填写连接信息。脚本会重建 `echo_market` 下的同名表，不要用于已有业务数据的环境。
+1. 准备 JDK 21、Tomcat 10.1 和 MySQL 8。
+2. 把 [`database/init.sql`](database/init.sql) 和 [`database/seed.sql`](database/seed.sql) 依次导入本地演示库，再将 [`c3p0.properties.example`](src/main/resources/c3p0.properties.example) 复制为同目录下的 `c3p0.properties`，填写连接信息。脚本会重建 `echo_market` 下的同名表，不要用于已有业务数据的环境。
 3. 在 Windows 运行 `mvnw.cmd clean package`，在 macOS 或 Linux 运行 `./mvnw clean package`。将生成的 `target/echo-market.war` 部署到 Tomcat 后，访问 `http://localhost:8080/echo-market/`（使用默认端口和部署路径时）。
 
 ## 许可证
