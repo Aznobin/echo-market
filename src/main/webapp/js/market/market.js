@@ -27,7 +27,7 @@
     const orderStatus = ['待付款', '待发货', '待收货', '已完成', '已取消'];
     const reportStatus = ['待处理', '已处理', '已驳回'];
     const deliveryLabel = { meetup: '校内当面交易', dorm: '送货到宿舍楼下' };
-    const payLabel = { online: '在线担保支付（演示）', cod: '当面验货付款' };
+    const payLabel = { online: '在线担保支付', cod: '当面验货付款' };
     const money = (n) => `<span class="price"><small>¥</small>${Number(n).toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span>`;
     const route = (page, ...params) => '#' + [page, ...params].map(encodeURIComponent).join('/');
     const go = (page, ...params) => { const next = route(page, ...params); if (location.hash === next) render(); else location.hash = next; };
@@ -71,9 +71,9 @@
 
     function account(page) {
       const register = page === 'register';
-      const current = currentId() || 'xiaoman';
+      const current = currentId() || '';
       const auth = register ? '注册' : '登录';
-      return `<div class="columns account-layout"><aside class="panel account-intro"><strong>回响市集</strong><p>让闲置在校园里继续派上用场。</p><div>${identity(current, 'large')}</div></aside><section class="panel account-panel">${head(auth, register ? '只建立本机演示昵称，不保存手机号或密码。' : '仅切换本机演示身份，不验证或保存密码。')}<form class="form" data-form="${page}">${field('用户名', `<input name="username" required maxlength="32" autocomplete="username"${register ? ' minlength="3"' : ''}>`)}${register ? field('昵称', '<input name="nickname" required maxlength="32" autocomplete="nickname">') + field('手机号', '<input type="tel" name="phone" required maxlength="11" pattern="1[3-9][0-9]{9}" title="请填写 11 位手机号" autocomplete="off">') : ''}${field('密码', `<input type="password" name="password" required maxlength="64" autocomplete="${register ? 'new-password' : 'current-password'}"${register ? ' minlength="6"' : ''}>`)}${register ? field('确认密码', '<input type="password" name="confirmPassword" required maxlength="64" autocomplete="new-password">') + '<label class="choice"><input type="checkbox" name="agree" value="1" required>我已阅读并同意《用户协议》</label>' : notice('体验预置身份：xiaoman（含管理员样板）、tang 或 he，密码可填任意示例字符。')} ${errorLine}<div class="actions"><button class="btn primary" type="submit">${auth}</button></div></form><p class="auth-switch">${register ? `已有账号？${link('去登录', route('login'))}` : `还没有账号？${link('去注册', route('register'))}`}</p></section></div>`;
+      return `<div class="columns account-layout"><aside class="panel account-intro"><strong>回响市集</strong><p>让闲置在校园里继续派上用场。</p><div>${identity(current, 'large')}</div></aside><section class="panel account-panel">${head(auth, register ? '注册后即可发布闲置、下单和联系卖家。' : '登录后即可使用市集功能。')}<form class="form" data-form="${page}">${field('用户名', `<input name="username" required maxlength="32" autocomplete="username"${register ? ' minlength="3"' : ''}>`)}${register ? field('昵称', '<input name="nickname" required maxlength="32" autocomplete="nickname">') + field('手机号', '<input type="tel" name="phone" required maxlength="11" pattern="1[3-9][0-9]{9}" title="请填写 11 位手机号" autocomplete="off">') : ''}${field('密码', `<input type="password" name="password" required maxlength="64" autocomplete="${register ? 'new-password' : 'current-password'}"${register ? ' minlength="6"' : ''}>`)}${register ? field('确认密码', '<input type="password" name="confirmPassword" required maxlength="64" autocomplete="new-password">') + '<label class="choice"><input type="checkbox" name="agree" value="1" required>我已阅读并同意《用户协议》</label>' : ''} ${errorLine}<div class="actions"><button class="btn primary" type="submit">${auth}</button></div></form><p class="auth-switch">${register ? `已有账号？${link('去登录', route('login'))}` : `还没有账号？${link('去注册', route('register'))}`}</p></section></div>`;
     }
 
     function messages(other, productId) {
@@ -98,7 +98,7 @@
     function checkout(p) {
       if (!p) return notFound('找不到这件商品');
       if (p.sold || p.seller === currentId()) return head('确认订单') + empty('该商品不能下单', '已售出或自己发布的闲置不能购买。', link('回商品详情', route('productdetail', p.id), 'btn'));
-      return head('确认订单', '选择校内交接方式，再核对商品和金额。', back('返回商品详情', route('productdetail', p.id))) + `<form class="columns" data-form="checkout"><input type="hidden" name="productId" value="${esc(p.id)}"><section class="panel form"><h2>交接与收货信息</h2>${choices('deliveryType', '交易方式', Object.entries(deliveryLabel))}<div class="form-row">${field('联系人称呼', `<input name="receiverName" value="${esc(name(currentId()).slice(0, 30))}" maxlength="30" required>`)}${field('联系电话 / 微信号', '<input name="phone" maxlength="30" placeholder="请填演示信息" required>')}</div>${field('校内交接 / 收货地址', '<input name="address" maxlength="120" placeholder="例如：图书馆一楼大厅" required>')}${choices('payMethod', '付款方式', Object.entries(payLabel))}${field('订单备注（选填）', '<textarea name="remark" rows="2" maxlength="200" placeholder="例如：周三傍晚方便交接。"></textarea>')}${errorLine}</section><aside class="panel"><h2>订单商品清单</h2><div class="summary-product">${media(p)}<div><strong>${esc(p.title)}</strong><p class="subtext">${esc(name(p.seller))}</p></div></div><div class="total"><strong>合计</strong>${money(p.price)}</div>${notice('仅模拟订单流转，请勿填写真实联系方式；不会扣款。')}<div class="actions"><button type="submit" class="btn primary">立即购买</button></div></aside></form>`;
+      return head('确认订单', '选择校内交接方式，再核对商品和金额。', back('返回商品详情', route('productdetail', p.id))) + `<form class="columns" data-form="checkout"><input type="hidden" name="productId" value="${esc(p.id)}"><section class="panel form"><h2>交接与收货信息</h2>${choices('deliveryType', '交易方式', Object.entries(deliveryLabel))}<div class="form-row">${field('联系人称呼', `<input name="receiverName" value="${esc(name(currentId()).slice(0, 30))}" maxlength="30" required>`)}${field('联系电话 / 微信号', '<input name="phone" maxlength="30" placeholder="请填写联系方式" required>')}</div>${field('校内交接 / 收货地址', '<input name="address" maxlength="120" placeholder="例如：图书馆一楼大厅" required>')}${choices('payMethod', '付款方式', Object.entries(payLabel))}${field('订单备注（选填）', '<textarea name="remark" rows="2" maxlength="200" placeholder="例如：周三傍晚方便交接。"></textarea>')}${errorLine}</section><aside class="panel"><h2>订单商品清单</h2><div class="summary-product">${media(p)}<div><strong>${esc(p.title)}</strong><p class="subtext">${esc(name(p.seller))}</p></div></div><div class="total"><strong>合计</strong>${money(p.price)}</div>${notice('请在交接时当面确认商品情况。')}<div class="actions"><button type="submit" class="btn primary">立即购买</button></div></aside></form>`;
     }
 
     const ownsOrder = (o) => o && [o.buyer, o.seller].includes(currentId());
@@ -108,10 +108,10 @@
       const seller = o.seller === currentId();
       const list = route(seller ? 'soldorders' : 'myorders');
       const counterpart = seller ? o.buyer : o.seller;
-      if (success) return `<section class="panel success">${tag('订单已提交', true)}${head('订单已提交', '样板已记录这笔订单，不产生付款。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
+      if (success) return `<section class="panel success">${tag('订单已提交', true)}${head('订单已提交', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
       const current = o.status;
-      const next = !seller && current === 0 ? ['模拟付款', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
-      const guidance = current === 0 ? (seller ? '等待买家完成模拟付款。' : '你可以模拟付款或取消订单。') : current === 1 ? (seller ? '与买家约定交接，并在交接后标记已发货。' : '等待卖家交接。你可以通过消息确认时间。') : current === 2 ? (seller ? '等待买家确认收货。' : '请在检查商品后确认收货。') : current === 3 ? '交易已完成，双方可以互相评价。' : '这笔订单已取消。';
+      const next = !seller && current === 0 ? ['付款', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
+      const guidance = current === 0 ? (seller ? '等待买家付款。' : '你可以付款或取消订单。') : current === 1 ? (seller ? '与买家约定交接，并在交接后标记已发货。' : '等待卖家交接。你可以通过消息确认时间。') : current === 2 ? (seller ? '等待买家确认收货。' : '请在检查商品后确认收货。') : current === 3 ? '交易已完成，双方可以互相评价。' : '这笔订单已取消。';
       const ratings = api.ratings.forOrder(o.id);
       const flow = current === 4 ? '' : `<ol class="steps" aria-label="订单进度">${orderStatus.slice(0, 4).map((s, i) => `<li class="tag${i === current ? ' current' : ''}"${i === current ? ' aria-current="step"' : ''}>${i + 1}. ${s}</li>`).join('')}</ol>`;
       const ratingForm = !ratings.some((r) => r.from === currentId()) ? `<form class="form" data-form="rating"><input type="hidden" name="orderId" value="${esc(o.id)}">${field('评分', '<select name="score"><option value="5">5 分</option><option value="4">4 分</option><option value="3">3 分</option><option value="2">2 分</option><option value="1">1 分</option></select>')}${field('评价内容（选填）', '<textarea name="content" rows="3" maxlength="255"></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交评价</button></div></form>` : '<p class="subtext">你已评价过这笔订单。</p>';
@@ -132,10 +132,10 @@
     function reportTarget(type, id) { return Number(type) === 1 ? '用户：' + name(id) : '商品：' + (listing(id)?.title || '不存在'); }
     function reportForm(type, target) {
       if ((type === '2' && !listing(target)) || (type === '1' && !isKnown(target)) || !['1','2'].includes(type)) return notFound('找不到举报对象');
-      return head('提交举报', '', back('返回市集', route('products'))) + `<div class="columns"><section class="panel"><h2>${esc(reportTarget(type, target))}</h2><form class="form" data-form="report"><input type="hidden" name="targetType" value="${type}"><input type="hidden" name="targetId" value="${esc(target)}">${field('举报理由', '<textarea name="reason" rows="5" maxlength="500" placeholder="请说明遇到的问题。" required></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交举报</button></div></form></section><aside class="panel"><h2>处理进度</h2><p class="muted">提交后可在「我的举报」查看该条记录。此表单只用于样板演示。</p><div class="actions">${link('我的举报', route('reports'))}</div></aside></div>`;
+      return head('提交举报', '', back('返回市集', route('products'))) + `<div class="columns"><section class="panel"><h2>${esc(reportTarget(type, target))}</h2><form class="form" data-form="report"><input type="hidden" name="targetType" value="${type}"><input type="hidden" name="targetId" value="${esc(target)}">${field('举报理由', '<textarea name="reason" rows="5" maxlength="500" placeholder="请说明遇到的问题。" required></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交举报</button></div></form></section><aside class="panel"><h2>处理进度</h2><p class="muted">提交后可在「我的举报」查看该条记录和处理进度。</p><div class="actions">${link('我的举报', route('reports'))}</div></aside></div>`;
     }
     function reportsPage(admin) {
-      if (admin && !user(currentId()).admin) return head('举报处理') + empty('此页面仅供管理员使用', '可从登录页切换到预置管理员演示身份。', link('去登录', route('login'), 'btn'));
+      if (admin && !user(currentId()).admin) return head('举报处理') + empty('此页面仅供管理员使用', '请使用管理员账号登录后查看。', link('去登录', route('login'), 'btn'));
       const items = api.reports.list(admin);
       return head(admin ? '举报处理' : '我提交过的举报', admin ? '查看待处理记录、标记处理结果或驳回。' : '查看提交记录及处理结果。') + (items.length ? `<div class="list">${items.map((r) => `<article class="record"><div class="body"><div class="identity">${tag(reportStatus[r.status], r.status === 0)}<span class="subtext">${esc(r.time)}</span></div><h2>${esc(reportTarget(r.targetType, r.targetId))}</h2><p>${esc(r.reason)}</p>${admin ? `<div class="subtext">举报人：${esc(name(r.from))}</div>` : ''}</div>${admin && r.status === 0 ? `<div class="right">${button('标记已处理', 'report-1', r.id, true)}${button('驳回', 'report-2', r.id)}</div>` : ''}</article>`).join('')}</div>` : empty('还没有举报记录', '提交的举报会显示在这里。', admin ? '' : browse()));
     }
@@ -162,7 +162,7 @@
       document.querySelector('#profile-summary').innerHTML = `${avatar(currentId())}<span>${esc(name(currentId()))}</span>`;
       document.querySelector('#profile-menu').innerHTML = currentId() ? [
         link('我的账号', route('welcome')), link('收到的评价', route('ratings', currentId())), link('我的举报', route('reports')),
-        user(currentId()).admin ? link('举报处理', route('adminreports')) : '', link('切换演示账号', route('login')),
+        user(currentId()).admin ? link('举报处理', route('adminreports')) : '', link('切换账号', route('login')),
         '<button type="button" data-action="logout">退出登录</button>',
       ].join('') : link('登录', route('login')) + link('注册', route('register'));
     }
@@ -171,7 +171,7 @@
       profile.open = false;
       renderProfile();
       if (!currentId() && protectedViews.has(page)) {
-        main.innerHTML = head('请先登录') + empty('登录后继续体验', '前端样板仅切换本机演示身份。', link('去登录', route('login', page, ...params), 'btn primary'));
+        main.innerHTML = head('请先登录') + empty('请先登录', '登录后继续使用市集功能。', link('去登录', route('login', page, ...params), 'btn primary'));
       } else main.innerHTML = Object.hasOwn(views, page) ? views[page](params) : notFound('找不到该页面');
       document.title = `${main.querySelector('h1')?.textContent || '浏览商品'} · 回响市集`;
       const section = ({ productdetail: 'products', productadd: 'products', messagethread: 'messages', soldorders: 'myorders', orderdetail: 'myorders', ordersuccess: 'myorders', orderbuyerinfo: 'myorders' })[page] || page;
@@ -226,8 +226,8 @@
         confirm: isBuyer && o.status === 2, cancel: o.status < 2,
       };
       if (!allowed[type]) return;
-      const title = { pay: '模拟付款', ship: '标记已发货', confirm: '确认收货', cancel: '取消订单' }[type];
-      confirmAction(title, type === 'pay' ? '确认后只更新样板订单状态，不会扣款。' : `确认${title}？这只会更新本机样板中的记录。`, () => {
+      const title = { pay: '付款', ship: '标记已发货', confirm: '确认收货', cancel: '取消订单' }[type];
+      confirmAction(title, type === 'pay' ? '确认后将更新订单状态。' : `确认${title}？`, () => {
         try {
           const result = api.orders.transition(id, type);
           saveFeedback(`订单状态：${orderStatus[result.value.status]}`, result);
@@ -268,7 +268,7 @@
         if (task === 'login' || task === 'register') {
           const account = { username: get('username'), nickname: get('nickname'), password: data.get('password'), confirmPassword: data.get('confirmPassword') };
           const result = task === 'register' ? api.account.register(account) : api.account.login({ username: account.username, password: account.password });
-          saveFeedback(task === 'register' ? '本机演示身份已建立' : '已登录到演示身份', result);
+          saveFeedback(task === 'register' ? '注册成功' : '登录成功', result);
           const [, next, ...params] = currentRoute();
           return Object.hasOwn(views, next) && next !== 'login' && next !== 'register' ? go(next, ...params) : go('welcome');
         }
@@ -297,7 +297,7 @@
           if (!p || p.sold || p.seller === currentId()) return formError(form, '该商品不能下单。');
           if (!get('receiverName') || !get('phone') || !get('address')) return formError(form, '请完整填写校内交接信息。');
           const payload = Object.fromEntries(['productId', 'receiverName', 'phone', 'address', 'remark', 'deliveryType', 'payMethod'].map((key) => [key, get(key)]));
-          confirmAction('确认购买', '这将创建一笔本机演示订单，不发生实际扣款。', () => {
+          confirmAction('确认购买', '确认提交这笔订单？', () => {
             try {
               const result = api.orders.create(payload);
               saveFeedback('订单已提交', result);
@@ -310,7 +310,7 @@
           render();
         } else if (task === 'report') {
           const result = api.reports.create({ targetType: Number(get('targetType')), targetId: get('targetId'), reason: get('reason') });
-          saveFeedback('举报已加入本机样板', result);
+          saveFeedback('举报已提交', result);
           go('reports');
         }
       } catch (error) { formError(form, error.message); }
@@ -321,7 +321,7 @@
       const el = event.target.closest('[data-action]');
       if (!el) return;
       const { action, value } = el.dataset;
-      if (action === 'logout') { saveFeedback('已退出演示身份', api.account.logout()); go('login'); }
+      if (action === 'logout') { saveFeedback('已退出登录', api.account.logout()); go('login'); }
       if (action === 'favorite') favorite(el);
       if (action.startsWith('order-')) statusAction(action.slice(6), value);
       if (action === 'report-1' || action === 'report-2') {
