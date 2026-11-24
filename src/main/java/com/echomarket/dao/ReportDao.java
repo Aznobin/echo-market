@@ -22,7 +22,7 @@ public class ReportDao {
     // 查询我的举报
     public List<Report> listByReporter(int reporterId) throws SQLException {
         String sql = "select r.id, r.reporter_id as reporterId, r.target_type as targetType, " +
-                "r.target_id as targetId, r.reason, r.handle_status as handleStatus, r.status, " +
+                "r.target_id as targetId, r.reason, r.handle_status as handleStatus, r.handle_remark as handleRemark, r.status, " +
                 "r.create_time as createTime, u.username as reporterName, " +
                 "CASE WHEN r.target_type = 2 THEN p.title ELSE tu.username END as targetTitle " +
                 "from report r " +
@@ -36,7 +36,7 @@ public class ReportDao {
     // 查询全部举报
     public List<Report> listAll() throws SQLException {
         String sql = "select r.id, r.reporter_id as reporterId, r.target_type as targetType, " +
-                "r.target_id as targetId, r.reason, r.handle_status as handleStatus, r.status, " +
+                "r.target_id as targetId, r.reason, r.handle_status as handleStatus, r.handle_remark as handleRemark, r.status, " +
                 "r.create_time as createTime, u.username as reporterName, " +
                 "CASE WHEN r.target_type = 2 THEN p.title ELSE tu.username END as targetTitle " +
                 "from report r " +
@@ -48,8 +48,8 @@ public class ReportDao {
     }
 
     // 更新举报处理结果
-    public int updateHandleStatus(int id, int handleStatus) throws SQLException {
-        String sql = "update report set handle_status = ? where id = ?";
-        return qr.update(sql, handleStatus, id);
+    public int updateHandleStatus(int id, int handleStatus, String handleRemark) throws SQLException {
+        String sql = "update report set handle_status = ?, handle_remark = ? where id = ?";
+        return qr.update(sql, handleStatus, handleRemark, id);
     }
 }

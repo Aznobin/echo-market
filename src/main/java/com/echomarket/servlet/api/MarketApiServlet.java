@@ -348,6 +348,7 @@ public class MarketApiServlet extends HttpServlet {
             map.put("targetId", String.valueOf(r.getTargetId()));
             map.put("reason", r.getReason());
             map.put("status", r.getHandleStatus());
+            map.put("remark", r.getHandleRemark());
             map.put("time", time(r.getCreateTime()));
             list.add(map);
         }
@@ -370,7 +371,7 @@ public class MarketApiServlet extends HttpServlet {
     private boolean handleReport(HttpServletRequest req) throws Exception {
         User user = requireUser(req);
         if (user.getRole() != 1) throw new IllegalStateException("仅管理员可操作");
-        reportDao.updateHandleStatus(Integer.parseInt(str(req, "id")), Integer.parseInt(str(req, "status")));
+        reportDao.updateHandleStatus(Integer.parseInt(str(req, "id")), Integer.parseInt(str(req, "status")), str(req, "remark").trim());
         return true;
     }
 

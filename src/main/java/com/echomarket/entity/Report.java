@@ -11,6 +11,7 @@ public class Report {
         private Integer targetId;
         private String reason;
         private Integer handleStatus;
+    private String handleRemark;
         private Integer status;
         private java.sql.Timestamp createTime;
         private String reporterName;

@@ -18,8 +18,9 @@ public class AdminReportHandleServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
         int status = Integer.parseInt(req.getParameter("handleStatus"));
+        String remark = req.getParameter("remark");
         try {
-            reportDao.updateHandleStatus(id, status);
+            reportDao.updateHandleStatus(id, status, remark == null ? "" : remark.trim());
         } catch (Exception e) {
             throw new ServletException(e);
         }
