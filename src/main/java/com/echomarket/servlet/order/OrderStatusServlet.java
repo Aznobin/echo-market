@@ -1,10 +1,10 @@
 package com.echomarket.servlet.order;
 
-import com.echomarket.entity.order.Order;
-import com.echomarket.dao.order.OrderDao;
+import com.echomarket.entity.Order;
+import com.echomarket.dao.OrderDao;
 
 import com.echomarket.dao.product.ProductDao;
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/orderstatus")
+// 订单状态操作
 public class OrderStatusServlet extends HttpServlet {
     private final OrderDao orderDao = new OrderDao();
     private final ProductDao productDao = new ProductDao();
@@ -41,6 +42,7 @@ public class OrderStatusServlet extends HttpServlet {
         }
 
         try {
+            // 查询订单并判断操作权限
             Order order = orderDao.findById(orderId);
             if (order == null) {
                 resp.sendRedirect(req.getContextPath() + "/myorders");
@@ -96,6 +98,7 @@ public class OrderStatusServlet extends HttpServlet {
                 return;
             }
 
+            // 更新订单状态
             int rows = orderDao.updateStatus(orderId, status, newStatus);
             if (rows != 1) {
                 resp.sendRedirect(req.getContextPath() + "/orderdetail?id=" + orderId + "&msg=" + enc("状态已被改过，请刷新再看"));

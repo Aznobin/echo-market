@@ -1,7 +1,7 @@
 package com.echomarket.servlet.account;
 
-import com.echomarket.entity.account.User;
-import com.echomarket.dao.account.UserDao;
+import com.echomarket.entity.User;
+import com.echomarket.dao.UserDao;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet("/register")
+// 注册页
 public class RegisterServlet extends HttpServlet {
     private final UserDao userDao = new UserDao();
 
@@ -29,6 +30,7 @@ public class RegisterServlet extends HttpServlet {
         String confirmPassword = req.getParameter("confirmPassword");
         String agree = req.getParameter("agree");
 
+        // 注册数据规则
         if (username == null || username.trim().isEmpty()) {
             req.setAttribute("msg", "用户名不能为空");
             req.getRequestDispatcher("register.jsp").forward(req, resp);
@@ -88,6 +90,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
+        // 判断去重
         try {
             if (userDao.findByUsername(username) != null) {
                 req.setAttribute("msg", "用户名已存在");
@@ -99,13 +102,14 @@ public class RegisterServlet extends HttpServlet {
                 req.getRequestDispatcher("register.jsp").forward(req, resp);
                 return;
             }
+            // 保存新用户
             User user = new User();
             user.setUsername(username);
             user.setNickname(nickname);
             user.setPhone(phone);
             user.setPassword(password);
             userDao.insert(user);
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/");
         } catch (SQLException e) {
             throw new ServletException("注册失败", e);
         }

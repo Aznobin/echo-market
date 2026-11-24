@@ -1,14 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="light" data-ctx="${pageContext.request.contextPath}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="回响市集校园二手交易平台的静态前端样板。">
+  <meta name="description" content="回响市集校园二手交易平台的校园二手交易平台。">
   <title>浏览商品 · 回响市集</title>
-  <script src="<c:url value='/js/market/fixtures.js'/>"></script>
-  <script src="<c:url value='/js/market/mock-api.js'/>"></script>
+  <script src="<c:url value='/js/market/http-api.js'/>"></script>
   <script src="<c:url value='/js/market/api.js'/>"></script>
   <script src="<c:url value='/js/market/bootstrap.js'/>"></script>
   <script src="<c:url value='/js/market/market.js'/>"></script>
@@ -38,7 +37,7 @@
     </div>
   </header>
   <main id="view" class="wrap main" tabindex="-1">
-    <noscript><p class="notice">请启用 JavaScript，以查看页面和前端演示数据。</p></noscript>
+    <noscript><p class="notice">请启用 JavaScript 以查看页面。</p></noscript>
   </main>
   <footer class="footer wrap">
     <span><strong>回响市集</strong> · EchoMarket</span>

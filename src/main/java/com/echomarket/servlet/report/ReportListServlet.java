@@ -1,9 +1,9 @@
 package com.echomarket.servlet.report;
 
-import com.echomarket.entity.report.Report;
-import com.echomarket.dao.report.ReportDao;
+import com.echomarket.entity.Report;
+import com.echomarket.dao.ReportDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/reports")
+// 我的举报页
 public class ReportListServlet extends HttpServlet {
     private final ReportDao reportDao = new ReportDao();
 

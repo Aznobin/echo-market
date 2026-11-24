@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @WebFilter(urlPatterns = {
         "/welcome.jsp",
+        "/profile",
         "/myorders",
         "/soldorders",
         "/orderdetail",
@@ -26,10 +27,9 @@ import java.io.IOException;
         "/reportadd",
         "/ratingadd",
         "/ratings",
-        "/adminreports",
-        "/adminreporthandle",
         "/product/add"
 })
+// 登录拦截器
 public class LoginFilter implements Filter {
     @Override
     public void doFilter(jakarta.servlet.ServletRequest request,

@@ -1,8 +1,8 @@
 package com.echomarket.servlet.favorite;
 
-import com.echomarket.dao.favorite.FavoriteDao;
+import com.echomarket.dao.FavoriteDao;
 
-import com.echomarket.entity.account.User;
+import com.echomarket.entity.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/favoritetoggle")
+// 收藏操作
 public class FavoriteToggleServlet extends HttpServlet {
     private final FavoriteDao favoriteDao = new FavoriteDao();
 
@@ -35,6 +36,7 @@ public class FavoriteToggleServlet extends HttpServlet {
             return;
         }
 
+        // 更新收藏状态
         try {
             if (favoriteDao.isFavorited(user.getId(), productId)) {
                 favoriteDao.cancel(user.getId(), productId);

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/productaddpage")
+// 发布商品页
 public class ProductAddPageServlet extends HttpServlet {
     private final CategoryDao categoryDao = new CategoryDao();
 
