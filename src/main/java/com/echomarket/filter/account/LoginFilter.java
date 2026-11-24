@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @WebFilter(urlPatterns = {
         "/welcome.jsp",
+        "/profile",
         "/myorders",
         "/soldorders",
         "/orderdetail",
