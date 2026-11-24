@@ -109,7 +109,7 @@ public class RegisterServlet extends HttpServlet {
             user.setPhone(phone);
             user.setPassword(password);
             userDao.insert(user);
-            resp.sendRedirect(req.getContextPath() + "/");
+            resp.sendRedirect(req.getContextPath() + "/#login");
         } catch (SQLException e) {
             throw new ServletException("注册失败", e);
         }
