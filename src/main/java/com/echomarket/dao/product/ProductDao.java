@@ -21,6 +21,16 @@ public class ProductDao {
         return qr.query(sql,new BeanListHandler<>(Product.class));
     }
 
+    public List<Product> findFavorites(int userId) throws SQLException {
+        String sql = "select p.id, p.title, p.description, p.price, p.image, " +
+                "p.category_id as categoryId, p.seller_id as sellerId, " +
+                "p.status, p.update_time as updateTime " +
+                "from favorite f join product p on f.product_id = p.id " +
+                "where f.user_id = ? and f.status = 1 and f.is_deleted = 0 " +
+                "order by f.create_time desc, f.id desc";
+        return qr.query(sql, new BeanListHandler<>(Product.class), userId);
+    }
+
     // 保存发布的商品
     public int insert(Product product) throws SQLException {
         String sql = "insert into product (title, description, price, image, category_id, seller_id, status) " +
