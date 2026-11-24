@@ -218,6 +218,7 @@ CREATE TABLE `rating` (
                           `content` text COMMENT '评价内容',
                           `status` int NOT NULL DEFAULT '1' COMMENT '状态：0隐藏 / 1正常',
                           `is_deleted` tinyint NOT NULL DEFAULT '0' COMMENT '软删除标记：0正常 / 1已删除',
+                          `handle_remark` varchar(255) DEFAULT NULL COMMENT '处理说明 / 驳回原因',
                           `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                           `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                           PRIMARY KEY (`id`),
@@ -256,6 +257,7 @@ CREATE TABLE `report` (
                           `handle_status` int NOT NULL DEFAULT '0' COMMENT '处理进度：0待处理 / 1已处理 / 2已驳回',
                           `status` int NOT NULL DEFAULT '1' COMMENT '状态：0无效 / 1有效',
                           `is_deleted` tinyint NOT NULL DEFAULT '0' COMMENT '软删除标记：0正常 / 1已删除',
+                          `handle_remark` varchar(255) DEFAULT NULL COMMENT '处理说明 / 驳回原因',
                           `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                           `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                           PRIMARY KEY (`id`),
@@ -272,7 +274,7 @@ CREATE TABLE `report` (
 
 LOCK TABLES `report` WRITE;
 /*!40000 ALTER TABLE `report` DISABLE KEYS */;
-INSERT INTO `report` VALUES (1,1,2,16,'描述和实物不太一样，想举报一下',1,1,0,'2026-11-21 18:26:58','2026-11-21 23:44:04'),(2,1,2,16,'测试举报',2,1,0,'2026-11-21 19:02:52','2026-11-21 23:44:10'),(3,1,2,18,'自测举报',2,1,0,'2026-11-21 19:39:16','2026-11-22 11:25:11'),(4,1,2,19,'对齐后举报',0,1,0,'2026-11-21 20:04:36','2026-11-21 23:42:42'),(5,1,2,20,'Integer改造举报',0,1,0,'2026-11-21 20:15:02','2026-11-21 23:42:42'),(6,1,2,9,'0',2,1,0,'2026-11-21 20:56:19','2026-11-22 15:24:02'),(7,3,2,10,'验证默认待处理',0,1,1,'2026-11-21 23:42:23','2026-11-21 23:42:42'),(8,3,2,26,'这什么狗屎介绍',2,1,0,'2026-11-22 00:47:27','2026-11-22 15:23:53');
+INSERT INTO `report` (`id`,`reporter_id`,`target_type`,`target_id`,`reason`,`handle_status`,`status`,`is_deleted`,`create_time`,`update_time`) VALUES (1,1,2,16,'描述和实物不太一样，想举报一下',1,1,0,'2026-11-21 18:26:58','2026-11-21 23:44:04'),(2,1,2,16,'测试举报',2,1,0,'2026-11-21 19:02:52','2026-11-21 23:44:10'),(3,1,2,18,'自测举报',2,1,0,'2026-11-21 19:39:16','2026-11-22 11:25:11'),(4,1,2,19,'对齐后举报',0,1,0,'2026-11-21 20:04:36','2026-11-21 23:42:42'),(5,1,2,20,'Integer改造举报',0,1,0,'2026-11-21 20:15:02','2026-11-21 23:42:42'),(6,1,2,9,'0',2,1,0,'2026-11-21 20:56:19','2026-11-22 15:24:02'),(7,3,2,10,'验证默认待处理',0,1,1,'2026-11-21 23:42:23','2026-11-21 23:42:42'),(8,3,2,26,'这什么狗屎介绍',2,1,0,'2026-11-22 00:47:27','2026-11-22 15:23:53');
 /*!40000 ALTER TABLE `report` ENABLE KEYS */;
 UNLOCK TABLES;
 

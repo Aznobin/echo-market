@@ -110,7 +110,7 @@
       const counterpart = seller ? o.buyer : o.seller;
       if (success) return `<section class="panel success">${tag('订单已提交', true)}${head('订单已提交', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
       const current = o.status;
-      const next = !seller && current === 0 ? ['付款', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
+      const next = !seller && current === 0 ? ['我已支付', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
       const guidance = current === 0 ? (seller ? '等待买家付款。' : '你可以付款或取消订单。') : current === 1 ? (seller ? '与买家约定交接，并在交接后标记已发货。' : '等待卖家交接。你可以通过消息确认时间。') : current === 2 ? (seller ? '等待买家确认收货。' : '请在检查商品后确认收货。') : current === 3 ? '交易已完成，双方可以互相评价。' : '这笔订单已取消。';
       const ratings = api.ratings.forOrder(o.id);
       const flow = current === 4 ? '' : `<ol class="steps" aria-label="订单进度">${orderStatus.slice(0, 4).map((s, i) => `<li class="tag${i === current ? ' current' : ''}"${i === current ? ' aria-current="step"' : ''}>${i + 1}. ${s}</li>`).join('')}</ol>`;
@@ -137,7 +137,7 @@
     function reportsPage(admin) {
       if (admin && !user(currentId()).admin) return head('举报处理') + empty('此页面仅供管理员使用', '请使用管理员账号登录后查看。', link('去登录', route('login'), 'btn'));
       const items = api.reports.list(admin);
-      return head(admin ? '举报处理' : '我提交过的举报', admin ? '查看待处理记录、标记处理结果或驳回。' : '查看提交记录及处理结果。') + (items.length ? `<div class="list">${items.map((r) => `<article class="record"><div class="body"><div class="identity">${tag(reportStatus[r.status], r.status === 0)}<span class="subtext">${esc(r.time)}</span></div><h2>${esc(reportTarget(r.targetType, r.targetId))}</h2><p>${esc(r.reason)}</p>${admin ? `<div class="subtext">举报人：${esc(name(r.from))}</div>` : ''}</div>${admin && r.status === 0 ? `<div class="right">${button('标记已处理', 'report-1', r.id, true)}${button('驳回', 'report-2', r.id)}</div>` : ''}</article>`).join('')}</div>` : empty('还没有举报记录', '提交的举报会显示在这里。', admin ? '' : browse()));
+      return head(admin ? '举报处理' : '我提交过的举报', admin ? '查看待处理记录、标记处理结果或驳回。' : '查看提交记录及处理结果。') + (items.length ? `<div class="list">${items.map((r) => `<article class="record"><div class="body"><div class="identity">${tag(reportStatus[r.status], r.status === 0)}<span class="subtext">${esc(r.time)}</span></div><h2>${esc(reportTarget(r.targetType, r.targetId))}</h2><p>${esc(r.reason)}</p>${admin ? `<div class="subtext">举报人：${esc(name(r.from))}</div>` : ''}${r.remark ? `<p class="subtext">处理说明：${esc(r.remark)}</p>` : ''}</div>${admin && r.status === 0 ? `<div class="right">${button('标记已处理', 'report-1', r.id, true)}${button('驳回', 'report-2', r.id)}</div>` : ''}</article>`).join('')}</div>` : empty('还没有举报记录', '提交的举报会显示在这里。', admin ? '' : browse()));
     }
 
     const notFound = (title) => head(title) + empty('这个页面暂不可用', '链接可能已失效。可以返回商品列表继续浏览。', browse());
@@ -226,12 +226,13 @@
         confirm: isBuyer && o.status === 2, cancel: o.status < 2,
       };
       if (!allowed[type]) return;
-      const title = { pay: '付款', ship: '标记已发货', confirm: '确认收货', cancel: '取消订单' }[type];
-      confirmAction(title, type === 'pay' ? '确认后将更新订单状态。' : `确认${title}？`, () => {
+      const title = { pay: '我已支付', ship: '标记已发货', confirm: '确认收货', cancel: '取消订单' }[type];
+      confirmAction(title, type === 'pay' ? '确认已完成支付？确认后订单进入待发货。' : `确认${title}？`, () => {
         try {
           const result = api.orders.transition(id, type);
           saveFeedback(`订单状态：${orderStatus[result.value.status]}`, result);
           render();
+          if (type === 'pay') go('orderdetail', id);
         } catch (error) { notify(error.message); }
       });
     }
@@ -325,9 +326,13 @@
       if (action === 'favorite') favorite(el);
       if (action.startsWith('order-')) statusAction(action.slice(6), value);
       if (action === 'report-1' || action === 'report-2') {
+        const rejected = action === 'report-2';
+        const remark = window.prompt(rejected ? '填写驳回原因' : '填写处理说明', '');
+        if (remark === null) return;
+        if (rejected && !remark.trim()) { notify('驳回需要填写原因'); return; }
         try {
-          const result = api.reports.handle(value, Number(action.at(-1)));
-          saveFeedback(`举报状态：${reportStatus[result.value.status]}`, result);
+          api.reports.handle(value, Number(action.at(-1)), remark.trim());
+          saveFeedback(`举报状态：${reportStatus[Number(action.at(-1))]}`, { persisted: true });
           render();
         } catch (error) { notify(error.message); }
       }

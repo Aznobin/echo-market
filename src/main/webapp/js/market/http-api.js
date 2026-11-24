@@ -97,8 +97,8 @@
           call('report', { targetType, targetId, reason }, 'POST');
           return { value: true, persisted: true };
         },
-        handle(id, status) {
-          call('reporthandle', { id, status }, 'POST');
+        handle(id, status, remark) {
+          call('reporthandle', { id, status, remark: remark || '' }, 'POST');
           return { value: true, persisted: true };
         },
       }),

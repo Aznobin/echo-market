@@ -47,6 +47,7 @@
                     <th width="150">举报对象</th>
                     <th>理由</th>
                     <th width="90">进度</th>
+                    <th width="150">处理说明</th>
                     <th width="230">处理</th>
                 </tr>
                 </thead>
@@ -70,15 +71,18 @@
                                 <c:otherwise>未知</c:otherwise>
                             </c:choose>
                         </td>
+                        <td>${empty r.handleRemark ? '—' : r.handleRemark}</td>
                         <td>
                             <form action="${pageContext.request.contextPath}/adminreporthandle" method="post" class="inline-form">
                                 <input type="hidden" name="id" value="${r.id}">
                                 <input type="hidden" name="handleStatus" value="1">
+                                <input type="text" name="remark" maxlength="255" placeholder="处理说明">
                                 <button class="btn btn-primary" type="submit">标记已处理</button>
                             </form>
                             <form action="${pageContext.request.contextPath}/adminreporthandle" method="post" class="inline-form">
                                 <input type="hidden" name="id" value="${r.id}">
                                 <input type="hidden" name="handleStatus" value="2">
+                                <input type="text" name="remark" maxlength="255" placeholder="驳回原因" required>
                                 <button class="btn btn-plain" type="submit">驳回</button>
                             </form>
                         </td>
