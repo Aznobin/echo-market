@@ -17,6 +17,17 @@ body{margin:0;min-height:100dvh;display:flex;flex-direction:column;font:15px/1.6
 @media(max-width:1100px){.wrap{width:calc(100% - 56px)}.navbar-inner{gap:20px}.nav-links{gap:19px}.product-grid{gap:14px}.card-copy{padding-inline:11px}}
 @media(max-width:850px){.wrap{width:calc(100% - 36px)}.navbar-inner{gap:12px}.nav-links{gap:12px}.nav-tools{gap:7px}.brand strong{font-size:17px}.brand-mark{width:31px;height:31px}.profile summary > span:last-child{max-width:52px}.product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.columns{grid-template-columns:minmax(0,1fr)}.chat{grid-template-columns:216px minmax(0,1fr)}.account-layout{max-width:600px}.account-intro{min-height:0}}
 @media(max-width:640px){.navbar-inner{height:auto;min-height:61px;flex-wrap:wrap;row-gap:0;padding-top:9px}.nav-links{order:3;width:100%;height:39px;justify-content:space-between}.nav-links a{font-size:13px}.nav-tools .btn{min-height:36px;padding-inline:9px;font-size:13px}.nav-tools .theme{font-size:20px;width:36px;padding:0}.hero{min-height:180px;padding:19px}.hero h1{max-width:17ch;font-size:clamp(30px,7vw,45px)}.hero-art{display:none}.main{padding-top:20px}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-copy h3{font-size:14px}.card-copy .price{font-size:17px}.card-copy .tag{font-size:10px;padding-inline:5px}.panel{padding:16px}.profile summary .avatar{width:30px;height:30px}.chat{grid-template-columns:minmax(0,1fr)}.chat-list{border-right:0;border-bottom:1px solid var(--line);max-height:195px;overflow:auto}.form-row,.record{grid-template-columns:minmax(0,1fr)}.record .right{justify-content:start}.footer{flex-direction:column;gap:5px}}
+.detail-layout > .detail-info > .description {
+    max-height: 260px;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    scrollbar-width: none;
+}
+
+.detail-layout > .detail-info > .description::-webkit-scrollbar {
+    display: none;
+}
+
 /* Keep intrinsic image dimensions from sizing the card or its grid tracks. */
 .product-media{position:relative}.product-media img{position:absolute;inset:0}
 @media(max-width:360px){.wrap{width:calc(100% - 24px)}.navbar-inner{gap:8px}.nav-tools{gap:5px}.card-top{flex-wrap:wrap;gap:5px}.card-bottom{gap:5px}}

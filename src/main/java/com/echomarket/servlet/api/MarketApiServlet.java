@@ -79,6 +79,7 @@ public class MarketApiServlet extends HttpServlet {
             case "product": return product(req);
             case "categories": return categories();
             case "favorites": return favorites(req);
+            case "favoriteproducts": return favoriteProducts(req);
             case "favorite": return toggleFavorite(req);
             case "messages": return conversations(req);
             case "thread": return thread(req);
@@ -88,6 +89,7 @@ public class MarketApiServlet extends HttpServlet {
             case "orderadd": return addOrder(req);
             case "orderstatus": return orderStatus(req);
             case "ratings": return ratings(req);
+            case "orderratings": return orderRatings(req);
             case "rating": return addRating(req);
             case "reports": return reports(req);
             case "report": return addReport(req);
@@ -154,6 +156,7 @@ public class MarketApiServlet extends HttpServlet {
         map.put("image", p.getImage() == null ? null : "images/" + p.getImage());
         map.put("seller", String.valueOf(p.getSellerId()));
         map.put("description", p.getDescription());
+        map.put("status", p.getStatus());
         map.put("sold", p.getStatus() != null && p.getStatus() != 0);
         return map;
     }
@@ -169,6 +172,13 @@ public class MarketApiServlet extends HttpServlet {
         List<String> ids = new ArrayList<>();
         for (Favorite f : favoriteDao.listByUser(user.getId())) ids.add(String.valueOf(f.getProductId()));
         return ids;
+    }
+
+    private List<Map<String, Object>> favoriteProducts(HttpServletRequest req) throws Exception {
+        User user = requireUser(req);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (Product p : productDao.findFavorites(user.getId())) list.add(productMap(p));
+        return list;
     }
 
     private boolean toggleFavorite(HttpServletRequest req) throws Exception {
@@ -188,14 +198,21 @@ public class MarketApiServlet extends HttpServlet {
             boolean mine = m.getFromId() == user.getId();
             String other = String.valueOf(mine ? m.getToId() : m.getFromId());
             String key = other + ":" + m.getProductId();
-            if (grouped.containsKey(key)) continue;
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("other", other);
-            map.put("productId", String.valueOf(m.getProductId()));
-            map.put("unread", false);
-            map.put("last", m.getContent());
-            map.put("lastTime", time(m.getCreateTime()));
-            grouped.put(key, map);
+            Map<String, Object> map = grouped.get(key);
+            if (map == null) {
+                map = new LinkedHashMap<>();
+                map.put("other", other);
+                map.put("productId", String.valueOf(m.getProductId()));
+                map.put("unread", false);
+                map.put("unreadCount", 0);
+                map.put("last", m.getContent());
+                map.put("lastTime", time(m.getCreateTime()));
+                grouped.put(key, map);
+            }
+            if (!mine && Integer.valueOf(0).equals(m.getIsRead()) && Integer.valueOf(1).equals(m.getStatus())) {
+                map.put("unread", true);
+                map.put("unreadCount", (int) map.get("unreadCount") + 1);
+            }
         }
         return new ArrayList<>(grouped.values());
     }
@@ -246,8 +263,12 @@ public class MarketApiServlet extends HttpServlet {
     private Map<String, Object> order(HttpServletRequest req) throws Exception {
         User user = requireUser(req);
         Order o = orderDao.findById(Integer.parseInt(str(req, "id")));
-        if (o == null || (o.getBuyerId() != user.getId() && o.getSellerId() != user.getId())) return null;
+        if (!isOrderParticipant(o, user)) return null;
         return orderMap(o);
+    }
+
+    private boolean isOrderParticipant(Order order, User user) {
+        return order != null && (order.getBuyerId() == user.getId() || order.getSellerId() == user.getId());
     }
 
     private Map<String, Object> orderMap(Order o) {
@@ -285,7 +306,7 @@ public class MarketApiServlet extends HttpServlet {
         User user = requireUser(req);
         int id = Integer.parseInt(str(req, "id"));
         Order o = orderDao.findById(id);
-        if (o == null) throw new IllegalStateException("订单不存在");
+        if (!isOrderParticipant(o, user)) throw new IllegalStateException("订单不存在或无权操作");
         String action = str(req, "status");
         int from = o.getStatus();
         int to = switch (action) {
@@ -304,6 +325,20 @@ public class MarketApiServlet extends HttpServlet {
         List<Map<String, Object>> list = new ArrayList<>();
         for (Rating r : ratingDao.listByToId(Integer.parseInt(str(req, "user")))) list.add(ratingMap(r));
         return list;
+    }
+
+    private Map<String, Object> orderRatings(HttpServletRequest req) throws Exception {
+        User user = requireUser(req);
+        int orderId = Integer.parseInt(str(req, "id"));
+        Order order = orderDao.findById(orderId);
+        if (!isOrderParticipant(order, user)) throw new IllegalStateException("订单不存在或无权查看");
+        List<Map<String, Object>> items = new ArrayList<>();
+        boolean hasReviewed = false;
+        for (Rating rating : ratingDao.listByOrder(orderId)) {
+            if (rating.getFromId() == user.getId()) hasReviewed = true;
+            if (Integer.valueOf(1).equals(rating.getStatus())) items.add(ratingMap(rating));
+        }
+        return Map.of("items", items, "hasReviewed", hasReviewed);
     }
 
     private Map<String, Object> ratingMap(Rating r) {

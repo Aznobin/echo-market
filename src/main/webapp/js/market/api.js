@@ -4,7 +4,7 @@
   const contract = Object.freeze({
     account: ['currentId', 'find', 'login', 'register', 'logout'],
     catalog: ['categories', 'list', 'find', 'publish'],
-    favorites: ['ids', 'toggle'],
+    favorites: ['ids', 'list', 'toggle'],
     messages: ['list', 'canOpen', 'open', 'send'],
     orders: ['list', 'find', 'create', 'transition'],
     ratings: ['forUser', 'forOrder', 'create'],
