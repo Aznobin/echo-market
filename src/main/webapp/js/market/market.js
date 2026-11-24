@@ -77,11 +77,11 @@
     }
 
     function messages(other, productId) {
-      const p = listing(productId);
-      const valid = api.messages.canOpen(other, productId);
+      const p = productId ? listing(productId) : null;
+      const valid = Boolean(other && productId) && api.messages.canOpen(other, productId);
       const active = valid ? api.messages.open(other, productId) : null;
       const list = api.messages.list();
-      const sidebar = list.map((t) => `<a class="chat-link" href="${route('messagethread', t.other, t.productId)}"${valid && t.other === other && t.productId === productId ? ' aria-current="page"' : ''}>${avatar(t.other)}<div><strong>${esc(name(t.other))}</strong><p>${esc(listing(t.productId)?.title || '商品')} · ${esc(t.items.at(-1)?.text)}</p></div>${t.unread ? '<span class="unread" role="img" aria-label="未读"></span>' : ''}</a>`).join('');
+      const sidebar = list.map((t) => `<a class="chat-link" href="${route('messagethread', t.other, t.productId)}"${valid && t.other === other && t.productId === productId ? ' aria-current="page"' : ''}>${avatar(t.other)}<div><strong>${esc(name(t.other))}</strong><p>${esc(listing(t.productId)?.title || '商品')} · ${esc(t.last || t.items?.at(-1)?.text || '')}</p></div>${t.unread ? '<span class="unread" role="img" aria-label="未读"></span>' : ''}</a>`).join('');
       const conversation = valid ? `<div class="chat-head">${identity(other)}${link(p.title, route('productdetail', p.id))}</div><div class="chat-log enter">${active?.items.length ? active.items.map((m) => `<div class="message${m.from === currentId() ? ' mine' : ''}">${avatar(m.from, 'mini')}<div><p class="subtext chat-meta">${esc(name(m.from))} · ${esc(m.time)}</p><p class="bubble">${esc(m.text)}</p></div></div>`).join('') : '<p class="muted">还没有消息。可以先问问商品状态或方便交接的时间。</p>'}</div><form class="compose" data-form="message"><input type="hidden" name="otherId" value="${esc(other)}"><input type="hidden" name="productId" value="${esc(p.id)}">${field('消息内容', '<textarea name="content" rows="2" maxlength="500" placeholder="写给对方的话…" required></textarea>')}<button type="submit" class="btn primary">发送</button></form>${errorLine}` : empty(other ? '找不到这段会话' : '还没选中会话', '从左侧选择一段对话，或在商品详情里联系卖家。', list.length ? '' : browse());
       return head('消息中心', '和同学确认商品细节、面交地点与时间。') + `<div class="chat"><aside class="chat-list" aria-label="会话列表"><h2>会话</h2>${sidebar || '<p class="subtext">暂无会话</p>'}</aside><section class="conversation" aria-label="聊天内容">${conversation}</section></div>`;
     }
@@ -334,6 +334,10 @@
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && profile.open) { profile.open = false; profile.querySelector('summary').focus(); }
+      if (event.key === 'Enter' && !event.shiftKey && event.target.matches('.compose textarea')) {
+        event.preventDefault();
+        event.target.form.requestSubmit();
+      }
     });
     document.addEventListener('error', (event) => {
       const target = event.target;
@@ -375,9 +379,12 @@
       writeLocal(themeKey, next);
       syncTheme();
     });
-    window.addEventListener('hashchange', () => render(true));
+    const safeRender = (focus) => {
+      try { render(focus); } catch (e) { main.innerHTML = '<p class="notice">页面加载失败：' + esc(e.message) + '</p>'; }
+    };
+    window.addEventListener('hashchange', () => safeRender(true));
     syncTheme();
-    render();
+    safeRender();
 
   });
 })();
