@@ -14,11 +14,20 @@ public class ProductDao {
     private QueryRunner qr = new QueryRunner(DBUtilDao.getDataSource());
     // 查询在售商品
     public List<Product> findAllOnSale() throws SQLException {
+        return findOnSaleByKeyword("");
+    }
+
+    // 按标题或描述搜索在售商品
+    public List<Product> findOnSaleByKeyword(String keyword) throws SQLException {
+        String normalized = keyword == null ? "" : keyword.trim();
         String sql = "select id, title, description, price, image, " +
                 "category_id as categoryId, seller_id as sellerId, " +
                 "status, update_time as updateTime " +
-                "from product where status = 0 order by update_time desc";
-        return qr.query(sql,new BeanListHandler<>(Product.class));
+                "from product where status = 0 " +
+                "and (? = '' or title like ? or description like ?) " +
+                "order by update_time desc";
+        String pattern = "%" + normalized + "%";
+        return qr.query(sql, new BeanListHandler<>(Product.class), normalized, pattern, pattern);
     }
 
     public List<Product> findFavorites(int userId) throws SQLException {

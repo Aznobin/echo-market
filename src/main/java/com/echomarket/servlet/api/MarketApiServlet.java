@@ -137,8 +137,9 @@ public class MarketApiServlet extends HttpServlet {
     }
 
     private List<Map<String, Object>> products(HttpServletRequest req) throws Exception {
+        String keyword = str(req, "q");
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Product p : productDao.findAllOnSale()) list.add(productMap(p));
+        for (Product p : productDao.findOnSaleByKeyword(keyword)) list.add(productMap(p));
         return list;
     }
 
