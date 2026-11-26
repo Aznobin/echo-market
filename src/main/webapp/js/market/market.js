@@ -13,7 +13,7 @@
     const theme = document.querySelector('#theme-toggle');
     const toast = document.querySelector('#toast');
     const dialog = document.querySelector('#confirm-dialog');
-    let toastTimer, pending, observer;
+    let toastTimer, pending, observer, focusSearchAfterNavigation = false;
     const api = window.echoMarket;
     const categories = api.catalog.categories();
     const currentId = api.account.currentId;
@@ -53,13 +53,16 @@
       return `<div class="product-grid">${items.map((p, i) => `<article class="product-card" data-reveal style="--delay:${i % 4 * 45}ms"><a class="product-media ${p.kind || ''}" href="${route('productdetail', p.id)}">${photo(p, '', i >= 4)}</a><div class="card-copy"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${money(p.price)}</div><h3>${link(p.title, route('productdetail', p.id), '')}</h3><div class="card-bottom">${identity(p.seller, 'mini')}${heart(p, true, saved.has(p.id))}</div>${favorites && p.sold ? tag(productStatus(p)) : ''}</div></article>`).join('')}</div>`;
     };
 
-    function market(favorites = false) {
+    function market(favorites = false, keyword = '') {
       if (favorites) {
         const items = api.favorites.list();
         return head('我的收藏', '留待下次再看的校园闲置。') + (items.length ? productGrid(items, true) : empty('暂时没有收藏', '在商品图片下点一下爱心，就能在这里找到它。', browse()));
       }
-      const items = api.catalog.list({ availableOnly: true });
-      return `<section class="hero"><div class="hero-copy enter"><p class="kicker">CAMPUS SECONDHAND</p><h1>校园好物，<em>接着用。</em></h1><p>把用不到的留给需要的人，在校园里见个面。</p></div><div class="hero-art" aria-hidden="true"><div class="stamp"><div><span>ECHO MARKET</span>校园交换站<span>CAMPUS MARKET</span></div></div></div></section><section aria-labelledby="market-title"><div class="section-heading"><h2 id="market-title">正在上架</h2><small>${items.length} 件在售闲置</small></div>${items.length ? productGrid(items) : empty('暂时没有在售闲置', '你可以发布一件闲置，让它回到校园里。', link('发布闲置', route('productadd'), 'btn primary'))}</section>`;
+      const query = String(keyword || '').trim();
+      const items = api.catalog.list({ availableOnly: true, q: query });
+      const search = `<form class="search-bar" data-form="search" role="search"><input id="product-search" name="q" value="${esc(query)}" maxlength="100" placeholder="搜索商品标题或描述" aria-label="搜索商品标题或描述"><button type="submit" class="btn primary">搜索</button>${query ? link('清除', route('products'), 'btn') : ''}</form>`;
+      const resultTitle = query ? `搜索“${query}”` : '正在上架';
+      return `<section class="hero"><div class="hero-copy enter"><p class="kicker">CAMPUS SECONDHAND</p><h1>校园好物，<em>接着用。</em></h1><p>把用不到的留给需要的人，在校园里见个面。</p></div><div class="hero-art" aria-hidden="true"><div class="stamp"><div><span>ECHO MARKET</span>校园交换站<span>CAMPUS MARKET</span></div></div></div></section><section aria-labelledby="market-title">${search}<div class="section-heading"><h2 id="market-title">${esc(resultTitle)}</h2><small>${items.length} 件在售闲置</small></div>${items.length ? productGrid(items) : empty(query ? '没有找到相关商品' : '暂时没有在售闲置', query ? '换个关键词试试。' : '你可以发布一件闲置，让它回到校园里。', query ? link('返回全部商品', route('products'), 'btn') : link('发布闲置', route('productadd'), 'btn primary'))}</section>`;
     }
 
     function productDetail(p) {
@@ -95,7 +98,7 @@
       const my = api.orders.list(seller ? 'seller' : 'buyer');
       const items = my.filter((o) => requested < 0 || requested === o.status);
       const tabs = `<nav class="tabs" aria-label="订单身份"><a href="${route('myorders')}"${!seller ? ' aria-current="page"' : ''}>我买到的</a><a href="${route('soldorders')}"${seller ? ' aria-current="page"' : ''}>我卖出的</a></nav>`;
-      return head(seller ? '我卖出的订单' : '我买到的订单', '查看在校园里买入与卖出的物品。') + tabs + `<div class="filters"><label>订单状态 <select id="order-filter" data-page="${seller ? 'soldorders' : 'myorders'}"><option value="all">全部状态</option>${orderStatus.map((s, i) => `<option value="${i}"${i === requested ? ' selected' : ''}>${s}</option>`).join('')}</select></label><span>${items.length} 笔订单</span></div>` + (items.length ? `<div class="list">${items.map((o) => { const p = listing(o.productId); return `<article class="record"><div class="intro">${p ? media(p) : ''}<div class="body"><p class="subtext">订单 EM${esc(o.id)} · ${esc(o.time)}</p><h2>${esc(p?.title || '商品')}</h2><p class="subtext">${seller ? '买家' : '卖家'}：${esc(name(seller ? o.buyer : o.seller))}</p></div></div><div class="right">${tag(orderStatus[o.status], o.status < 3)}${money(o.amount)}${link('订单详情', route('orderdetail', o.id), 'btn')}</div></article>`; }).join('')}</div>` : empty('这个状态下没有订单', '试试切换订单状态，或回市集逛一逛。', browse()));
+      return head(seller ? '我卖出的订单' : '我买到的订单', '查看在校园里买入与卖出的物品。') + tabs + `<div class="filters"><label>订单状态 <select id="order-filter" data-page="${seller ? 'soldorders' : 'myorders'}"><option value="all">全部状态</option>${orderStatus.map((s, i) => `<option value="${i}"${i === requested ? ' selected' : ''}>${s}</option>`).join('')}</select></label><span>${items.length} 笔订单</span></div>` + (items.length ? `<div class="list">${items.map((o) => { const p = listing(o.productId); return `<article class="record"><div class="intro">${p ? media(p) : ''}<div class="body"><p class="subtext">订单 ${esc(o.orderNo || '订单号缺失')} · ${esc(o.time)}</p><h2>${esc(p?.title || '商品')}</h2><p class="subtext">${seller ? '买家' : '卖家'}：${esc(name(seller ? o.buyer : o.seller))}</p></div></div><div class="right">${tag(orderStatus[o.status], o.status < 3)}${money(o.amount)}${link('订单详情', route('orderdetail', o.id), 'btn')}</div></article>`; }).join('')}</div>` : empty('这个状态下没有订单', '试试切换订单状态，或回市集逛一逛。', browse()));
     }
 
     const choices = (group, legend, options) => `<fieldset><legend>${legend}</legend><div class="form-row">${options.map(([value, title], i) => `<label class="choice"><input type="radio" name="${group}" value="${value}"${i === 0 ? ' checked' : ''}>${title}</label>`).join('')}</div></fieldset>`;
@@ -112,14 +115,14 @@
       const seller = o.seller === currentId();
       const list = route(seller ? 'soldorders' : 'myorders');
       const counterpart = seller ? o.buyer : o.seller;
-      if (success) return `<section class="panel success">${tag('支付成功！', true)}${head('订单已提交！', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 EM${esc(o.id)}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
+      if (success) return `<section class="panel success">${tag('支付成功！', true)}${head('订单已提交！', '订单已记录，请按约定完成交接。')}<div class="summary-product">${p ? media(p) : ''}<strong>${esc(p?.title || '商品')}</strong></div><div class="total"><span>订单 ${esc(o.orderNo || '订单号缺失')}</span>${money(o.amount)}</div><div class="actions">${link('查看订单详情', route('orderdetail', o.id), 'btn primary')}${browse()}</div></section>`;
       const current = o.status;
       const next = !seller && current === 0 ? ['我已支付', 'pay'] : seller && current === 1 ? ['标记已发货', 'ship'] : !seller && current === 2 ? ['确认收货', 'confirm'] : null;
       const guidance = current === 0 ? (seller ? '等待买家付款。' : '你可以付款或取消订单。') : current === 1 ? (seller ? '与买家约定交接，并在交接后标记已发货。' : '等待卖家交接。你可以通过消息确认时间。') : current === 2 ? (seller ? '等待买家确认收货。' : '请在检查商品后确认收货。') : current === 3 ? '交易已完成，双方可以互相评价。' : '这笔订单已取消。';
       const { items: ratings, hasReviewed } = current === 3 ? api.ratings.forOrder(o.id) : { items: [], hasReviewed: false };
       const flow = current === 4 ? '' : `<ol class="steps" aria-label="订单进度">${orderStatus.slice(0, 4).map((s, i) => `<li class="tag${i === current ? ' current' : ''}"${i === current ? ' aria-current="step"' : ''}>${i + 1}. ${s}</li>`).join('')}</ol>`;
       const ratingForm = !hasReviewed ? `<form class="form" data-form="rating"><input type="hidden" name="orderId" value="${esc(o.id)}">${field('评分', '<select name="score"><option value="5">5 分</option><option value="4">4 分</option><option value="3">3 分</option><option value="2">2 分</option><option value="1">1 分</option></select>')}${field('评价内容（选填）', '<textarea name="content" rows="3" maxlength="255"></textarea>')}${errorLine}<div class="actions"><button type="submit" class="btn primary">提交评价</button></div></form>` : '<p class="subtext">你已评价过这笔订单。</p>';
-      return head('订单详情', `订单 EM${o.id} · ${o.time}`, back('返回订单列表', list)) + `<div class="columns"><div class="stack"><section class="panel"><div class="card-top"><h2>当前进度</h2>${tag(orderStatus[current], current < 3)}</div>${flow}<p>${esc(guidance)}</p><div class="actions">${next ? button(next[0], `order-${next[1]}`, o.id, true) : ''}${current < 2 ? button('取消订单', 'order-cancel', o.id) : ''}${p ? link(seller ? '联系买家' : '联系卖家', route('messagethread', counterpart, p.id), 'btn') : ''}</div></section><section class="panel"><h2>交接与付款信息</h2><dl class="info"><dt>交接方式</dt><dd>${esc(deliveryLabel[o.deliveryType])}</dd><dt>联系人</dt><dd>${esc(o.receiverName)}</dd><dt>联系电话</dt><dd>${esc(o.phone)}</dd><dt>交接地点</dt><dd>${esc(o.address)}</dd><dt>支付方式</dt><dd>${esc(payLabel[o.payMethod])}</dd><dt>订单备注</dt><dd>${esc(o.remark || '未填写')}</dd></dl></section>${current === 3 ? `<section class="panel stack"><h2>这笔订单的评价</h2>${ratings.map(ratingRecord).join('')}${ratingForm}</section>` : ''}</div><aside class="panel"><h2>订单商品</h2><div class="summary-product">${p ? media(p) : ''}<div><strong>${p ? link(p.title, route('productdetail', p.id)) : '商品'}</strong><div class="subtext">${seller ? '买家' : '卖家'}：${identity(counterpart, 'mini')}</div></div></div><div class="total"><span>合计</span>${money(o.amount)}</div></aside></div>`;
+      return head('订单详情', `订单 ${o.orderNo || '订单号缺失'} · ${o.time}`, back('返回订单列表', list)) + `<div class="columns"><div class="stack"><section class="panel"><div class="card-top"><h2>当前进度</h2>${tag(orderStatus[current], current < 3)}</div>${flow}<p>${esc(guidance)}</p><div class="actions">${next ? button(next[0], `order-${next[1]}`, o.id, true) : ''}${current < 2 ? button('取消订单', 'order-cancel', o.id) : ''}${p ? link(seller ? '联系买家' : '联系卖家', route('messagethread', counterpart, p.id), 'btn') : ''}</div></section><section class="panel"><h2>交接与付款信息</h2><dl class="info"><dt>交接方式</dt><dd>${esc(deliveryLabel[o.deliveryType])}</dd><dt>联系人</dt><dd>${esc(o.receiverName)}</dd><dt>联系电话</dt><dd>${esc(o.phone)}</dd><dt>交接地点</dt><dd>${esc(o.address)}</dd><dt>支付方式</dt><dd>${esc(payLabel[o.payMethod])}</dd><dt>订单备注</dt><dd>${esc(o.remark || '未填写')}</dd></dl></section>${current === 3 ? `<section class="panel stack"><h2>这笔订单的评价</h2>${ratings.map(ratingRecord).join('')}${ratingForm}</section>` : ''}</div><aside class="panel"><h2>订单商品</h2><div class="summary-product">${p ? media(p) : ''}<div><strong>${p ? link(p.title, route('productdetail', p.id)) : '商品'}</strong><div class="subtext">${seller ? '买家' : '卖家'}：${identity(counterpart, 'mini')}</div></div></div><div class="total"><span>合计</span>${money(o.amount)}</div></aside></div>`;
     }
 
     function ratingRecord(r) {
@@ -147,7 +150,7 @@
     const notFound = (title) => head(title) + empty('这个页面暂不可用', '链接可能已失效。可以返回商品列表继续浏览。', browse());
     const isKnown = (id) => Boolean(api.account.find(id));
     const views = {
-      products: () => market(), favorites: () => market(true),
+      products: ([q]) => market(false, q || ''), favorites: () => market(true),
       productdetail: ([id]) => productDetail(listing(id)), productadd: () => publishPage(),
       messages: () => messages(), messagethread: ([other, id]) => messages(other, id),
       myorders: ([filter]) => orderList(false, filter), soldorders: ([filter]) => orderList(true, filter),
@@ -191,6 +194,11 @@
       }
       const chat = main.querySelector('.chat-log');
       if (chat) chat.scrollTop = chat.scrollHeight;
+      if (focusSearchAfterNavigation) {
+        focusSearchAfterNavigation = false;
+        const input = main.querySelector('#product-search');
+        if (input) { input.focus(); return; }
+      }
       if (focus) { window.scrollTo(0, 0); main.focus({ preventScroll: true }); }
     }
     function syncTheme() {
@@ -270,6 +278,10 @@
       const task = form.dataset.form;
       formError(form);
       try {
+        if (task === 'search') {
+          const query = get('q');
+          return go('products', ...(query ? [query] : []));
+        }
         if (task === 'login' || task === 'register') {
           const account = { username: get('username'), nickname: get('nickname'), password: data.get('password'), confirmPassword: data.get('confirmPassword') };
           const result = task === 'register' ? api.account.register(account) : api.account.login({ username: account.username, password: account.password });
@@ -322,6 +334,15 @@
     }
 
     document.addEventListener('click', (event) => {
+      if (event.target.closest('.search-link') && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+        event.preventDefault();
+        const input = document.querySelector('#product-search');
+        if (input) input.focus();
+        else {
+          focusSearchAfterNavigation = true;
+          go('products');
+        }
+      }
       if (!profile.contains(event.target) || event.target.closest('.profile-menu a')) profile.open = false;
       const el = event.target.closest('[data-action]');
       if (!el) return;
