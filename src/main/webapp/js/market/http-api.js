@@ -34,7 +34,7 @@
       }),
       catalog: Object.freeze({
         categories: () => call('categories'),
-        list: () => call('products'),
+        list: (params = {}) => call('products', { q: params.q || '' }),
         find: (id) => call('product', { id }),
         publish({ title, price, categoryId, image, description }) {
           const form = new FormData();

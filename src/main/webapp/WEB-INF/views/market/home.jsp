@@ -27,6 +27,7 @@
         <a href="#favorites" data-nav="favorites">我的收藏</a>
       </nav>
       <div class="nav-tools">
+        <a class="btn search-link" href="#products">搜索商品</a>
         <a class="btn primary publish" href="#productadd"><span aria-hidden="true">＋</span> 发布闲置</a>
         <button type="button" class="btn theme" id="theme-toggle" aria-label="切换暗色主题" title="切换暗色主题" aria-pressed="false"><span aria-hidden="true">☾</span></button>
         <details class="profile" id="profile">
