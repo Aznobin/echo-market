@@ -13,7 +13,7 @@
     const theme = document.querySelector('#theme-toggle');
     const toast = document.querySelector('#toast');
     const dialog = document.querySelector('#confirm-dialog');
-    let toastTimer, pending, observer;
+    let toastTimer, pending, observer, focusSearchAfterNavigation = false;
     const api = window.echoMarket;
     const categories = api.catalog.categories();
     const currentId = api.account.currentId;
@@ -53,13 +53,16 @@
       return `<div class="product-grid">${items.map((p, i) => `<article class="product-card" data-reveal style="--delay:${i % 4 * 45}ms"><a class="product-media ${p.kind || ''}" href="${route('productdetail', p.id)}">${photo(p, '', i >= 4)}</a><div class="card-copy"><div class="card-top">${tag(categories[p.categoryId - 1] || '其他闲置')}${money(p.price)}</div><h3>${link(p.title, route('productdetail', p.id), '')}</h3><div class="card-bottom">${identity(p.seller, 'mini')}${heart(p, true, saved.has(p.id))}</div>${favorites && p.sold ? tag(productStatus(p)) : ''}</div></article>`).join('')}</div>`;
     };
 
-    function market(favorites = false) {
+    function market(favorites = false, keyword = '') {
       if (favorites) {
         const items = api.favorites.list();
         return head('我的收藏', '留待下次再看的校园闲置。') + (items.length ? productGrid(items, true) : empty('暂时没有收藏', '在商品图片下点一下爱心，就能在这里找到它。', browse()));
       }
-      const items = api.catalog.list({ availableOnly: true });
-      return `<section class="hero"><div class="hero-copy enter"><p class="kicker">CAMPUS SECONDHAND</p><h1>校园好物，<em>接着用。</em></h1><p>把用不到的留给需要的人，在校园里见个面。</p></div><div class="hero-art" aria-hidden="true"><div class="stamp"><div><span>ECHO MARKET</span>校园交换站<span>CAMPUS MARKET</span></div></div></div></section><section aria-labelledby="market-title"><div class="section-heading"><h2 id="market-title">正在上架</h2><small>${items.length} 件在售闲置</small></div>${items.length ? productGrid(items) : empty('暂时没有在售闲置', '你可以发布一件闲置，让它回到校园里。', link('发布闲置', route('productadd'), 'btn primary'))}</section>`;
+      const query = String(keyword || '').trim();
+      const items = api.catalog.list({ availableOnly: true, q: query });
+      const search = `<form class="search-bar" data-form="search" role="search"><input id="product-search" name="q" value="${esc(query)}" maxlength="100" placeholder="搜索商品标题或描述" aria-label="搜索商品标题或描述"><button type="submit" class="btn primary">搜索</button>${query ? link('清除', route('products'), 'btn') : ''}</form>`;
+      const resultTitle = query ? `搜索“${query}”` : '正在上架';
+      return `<section class="hero"><div class="hero-copy enter"><p class="kicker">CAMPUS SECONDHAND</p><h1>校园好物，<em>接着用。</em></h1><p>把用不到的留给需要的人，在校园里见个面。</p></div><div class="hero-art" aria-hidden="true"><div class="stamp"><div><span>ECHO MARKET</span>校园交换站<span>CAMPUS MARKET</span></div></div></div></section><section aria-labelledby="market-title">${search}<div class="section-heading"><h2 id="market-title">${esc(resultTitle)}</h2><small>${items.length} 件在售闲置</small></div>${items.length ? productGrid(items) : empty(query ? '没有找到相关商品' : '暂时没有在售闲置', query ? '换个关键词试试。' : '你可以发布一件闲置，让它回到校园里。', query ? link('返回全部商品', route('products'), 'btn') : link('发布闲置', route('productadd'), 'btn primary'))}</section>`;
     }
 
     function productDetail(p) {
@@ -147,7 +150,7 @@
     const notFound = (title) => head(title) + empty('这个页面暂不可用', '链接可能已失效。可以返回商品列表继续浏览。', browse());
     const isKnown = (id) => Boolean(api.account.find(id));
     const views = {
-      products: () => market(), favorites: () => market(true),
+      products: ([q]) => market(false, q || ''), favorites: () => market(true),
       productdetail: ([id]) => productDetail(listing(id)), productadd: () => publishPage(),
       messages: () => messages(), messagethread: ([other, id]) => messages(other, id),
       myorders: ([filter]) => orderList(false, filter), soldorders: ([filter]) => orderList(true, filter),
@@ -191,6 +194,11 @@
       }
       const chat = main.querySelector('.chat-log');
       if (chat) chat.scrollTop = chat.scrollHeight;
+      if (focusSearchAfterNavigation) {
+        focusSearchAfterNavigation = false;
+        const input = main.querySelector('#product-search');
+        if (input) { input.focus(); return; }
+      }
       if (focus) { window.scrollTo(0, 0); main.focus({ preventScroll: true }); }
     }
     function syncTheme() {
@@ -270,6 +278,10 @@
       const task = form.dataset.form;
       formError(form);
       try {
+        if (task === 'search') {
+          const query = get('q');
+          return go('products', ...(query ? [query] : []));
+        }
         if (task === 'login' || task === 'register') {
           const account = { username: get('username'), nickname: get('nickname'), password: data.get('password'), confirmPassword: data.get('confirmPassword') };
           const result = task === 'register' ? api.account.register(account) : api.account.login({ username: account.username, password: account.password });
@@ -322,6 +334,15 @@
     }
 
     document.addEventListener('click', (event) => {
+      if (event.target.closest('.search-link') && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+        event.preventDefault();
+        const input = document.querySelector('#product-search');
+        if (input) input.focus();
+        else {
+          focusSearchAfterNavigation = true;
+          go('products');
+        }
+      }
       if (!profile.contains(event.target) || event.target.closest('.profile-menu a')) profile.open = false;
       const el = event.target.closest('[data-action]');
       if (!el) return;
